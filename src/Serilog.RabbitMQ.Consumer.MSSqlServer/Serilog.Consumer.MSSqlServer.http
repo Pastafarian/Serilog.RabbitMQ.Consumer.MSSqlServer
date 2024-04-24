@@ -1,0 +1,6 @@
+@Serilog.Consumer.MSSqlServer_HostAddress = http://localhost:5078
+
+GET {{Serilog.Consumer.MSSqlServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
