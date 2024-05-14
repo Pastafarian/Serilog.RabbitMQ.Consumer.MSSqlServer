@@ -1,8 +1,7 @@
-﻿using Serilog.Sinks.MSSqlServer.Platform;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Xunit;
+﻿using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Platform
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SqlCreateDatabaseWriterTests

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Moq;
-using Serilog.Sinks.MSSqlServer.Platform;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Xunit;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Platform
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SqlCreateTableWriterTests : IDisposable
@@ -14,13 +13,13 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         private readonly string _tableName = "TestTableName";
         private readonly DataTable _dataTable;
         private readonly Mock<IDataTableCreator> _dataTableCreatorMock;
-        private MSSqlServer.ColumnOptions _columnOptions;
+        private Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _columnOptions;
         private SqlCreateTableWriter _sut;
         private bool _disposedValue;
 
         public SqlCreateTableWriterTests()
         {
-            _columnOptions = new MSSqlServer.ColumnOptions();
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             _dataTable = new DataTable();
             _dataTableCreatorMock = new Mock<IDataTableCreator>();
             _dataTableCreatorMock.Setup(c => c.CreateDataTable()).Returns(_dataTable);
@@ -49,7 +48,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             var sqlColumnId = new SqlColumn { AllowNull = false, ColumnName = "Id", DataType = SqlDbType.Int, StandardColumnIdentifier = StandardColumn.Id };
-            _columnOptions = new MSSqlServer.ColumnOptions { PrimaryKey = sqlColumnId };
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { PrimaryKey = sqlColumnId };
             var dataColumnId = new DataColumn();
             dataColumnId.ExtendedProperties["SqlColumn"] = sqlColumnId;
             _dataTable.Columns.Add(dataColumnId);
@@ -70,7 +69,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             var sqlColumnId = new SqlColumn { AllowNull = false, ColumnName = "Id", DataType = SqlDbType.Int };
-            _columnOptions = new MSSqlServer.ColumnOptions { PrimaryKey = sqlColumnId };
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { PrimaryKey = sqlColumnId };
             var dataColumnId = new DataColumn();
             dataColumnId.ExtendedProperties["SqlColumn"] = sqlColumnId;
             var dataColumnMessage = new DataColumn();
@@ -99,7 +98,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
             var sqlColumnMessage = new SqlColumn { AllowNull = false, ColumnName = "Message", DataType = SqlDbType.NVarChar };
             dataColumnMessage.ExtendedProperties["SqlColumn"] = sqlColumnMessage;
             _dataTable.Columns.Add(dataColumnMessage);
-            _columnOptions = new MSSqlServer.ColumnOptions();
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             var expectedResult = "CREATE TABLE [TestSchemaName].[TestTableName] ( \r\n"
                 + "[Message] NVARCHAR(MAX) NOT NULL\r\n";
             SetupSut();
@@ -116,7 +115,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             var sqlColumnId = new SqlColumn { AllowNull = false, ColumnName = "Id", DataType = SqlDbType.Int };
-            _columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions { PrimaryKey = sqlColumnId };
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { PrimaryKey = sqlColumnId };
             var dataColumnId = new DataColumn();
             dataColumnId.ExtendedProperties["SqlColumn"] = sqlColumnId;
             var dataColumnException = new DataColumn();
@@ -142,7 +141,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             var sqlColumnId = new SqlColumn { AllowNull = false, ColumnName = "Id", DataType = SqlDbType.Int };
-            _columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions { PrimaryKey = sqlColumnId };
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { PrimaryKey = sqlColumnId };
             var dataColumnId = new DataColumn();
             dataColumnId.ExtendedProperties["SqlColumn"] = sqlColumnId;
             var dataColumnIndexCol1 = new DataColumn();
@@ -177,7 +176,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             var sqlColumnId = new SqlColumn { AllowNull = false, ColumnName = "Id", DataType = SqlDbType.Int, StandardColumnIdentifier = StandardColumn.Id };
-            _columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions { PrimaryKey = sqlColumnId, ClusteredColumnstoreIndex = true };
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { PrimaryKey = sqlColumnId, ClusteredColumnstoreIndex = true };
             var dataColumnId = new DataColumn();
             dataColumnId.ExtendedProperties["SqlColumn"] = sqlColumnId;
             var dataColumnMessage = new DataColumn();

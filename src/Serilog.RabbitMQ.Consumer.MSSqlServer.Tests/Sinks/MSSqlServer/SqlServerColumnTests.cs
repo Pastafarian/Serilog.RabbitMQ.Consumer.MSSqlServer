@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 using static System.FormattableString;
 
-namespace Serilog.Sinks.MSSqlServer.Tests
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SqlServerColumnTests

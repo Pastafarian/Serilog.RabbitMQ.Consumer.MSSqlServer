@@ -25,8 +25,6 @@ IConfiguration auditConfiguration = new ConfigurationBuilder()
 var auditLogger = LoggerBuilder.BuildAuditLogger(auditConfiguration);
 builder.Services.AddSingleton<IAuditLogger>(_ => new AuditLogger(auditLogger));
 
-Log.Information("Hello, world!");
-
 builder.Host.UseSerilog();
 
 var app = builder.Build();

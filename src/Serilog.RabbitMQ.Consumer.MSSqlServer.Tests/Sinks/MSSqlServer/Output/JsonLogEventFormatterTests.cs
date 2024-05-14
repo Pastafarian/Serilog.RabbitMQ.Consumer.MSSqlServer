@@ -4,9 +4,9 @@ using Serilog.Parsing;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class JsonLogEventFormatterTests
@@ -21,7 +21,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             _testColumnOptions.Store.Add(StandardColumn.LogEvent);
 
             // TODO use mock for _testColumnsDataGenerator
-            _testStandardColumnDataGenerator = new StandardColumnDataGenerator(_testColumnOptions, new XmlPropertyFormatter(), logEventFormatter: null);
+            _testStandardColumnDataGenerator = new StandardColumnDataGenerator(_testColumnOptions, new XmlPropertyFormatter());
 
             _sut = new JsonLogEventFormatter(_testColumnOptions, _testStandardColumnDataGenerator);
         }
@@ -116,8 +116,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             const string expectedResult = "{\"TimeStamp\":\"2020-03-27T14:17:00.0000000\",\"Level\":\"Information\",\"Message\":\"\",\"MessageTemplate\":\"Test message template\",\"Properties\":{\"TestProperty1\":\"TestValue1\",\"TestProperty2\":2}}";
             var properties = new List<LogEventProperty>
             {
-                new LogEventProperty("TestProperty1", new ScalarValue("TestValue1")),
-                new LogEventProperty("TestProperty2", new ScalarValue(2))
+                new("TestProperty1", new ScalarValue("TestValue1")),
+                new("TestProperty2", new ScalarValue(2))
             };
             var testLogEvent = CreateTestLogEvent(new DateTimeOffset(2020, 3, 27, 14, 17, 0, TimeSpan.Zero), properties);
 
@@ -141,8 +141,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             _testColumnOptions.LogEvent.ExcludeStandardColumns = true;
             var properties = new List<LogEventProperty>
             {
-                new LogEventProperty("TestProperty1", new ScalarValue("TestValue1")),
-                new LogEventProperty("TestProperty2", new ScalarValue(2))
+                new("TestProperty1", new ScalarValue("TestValue1")),
+                new("TestProperty2", new ScalarValue(2))
             };
             var testLogEvent = CreateTestLogEvent(new DateTimeOffset(2020, 3, 27, 14, 17, 0, TimeSpan.Zero), properties);
 

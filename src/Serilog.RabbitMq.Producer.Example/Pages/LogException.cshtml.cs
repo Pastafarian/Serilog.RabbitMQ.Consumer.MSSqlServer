@@ -23,10 +23,7 @@ namespace Serilog.Producer.RabbitMq.Example.Pages
             }
             catch (Exception ex)
             {
-                for (var i = 0; i < 20; i++)
-                {
-                    _logger.Error(ex, "Log Error");
-                }
+                _logger.Error(ex, "Log Error");
             }
         }
     }

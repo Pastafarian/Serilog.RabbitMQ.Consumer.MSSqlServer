@@ -1,7 +1,7 @@
 ﻿using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Options;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Options
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Options
 {
     [Obsolete("Backwards compatibility tests for old SinkOptions class", error: false)]
     [Trait(TestCategory.TraitName, TestCategory.Unit)]

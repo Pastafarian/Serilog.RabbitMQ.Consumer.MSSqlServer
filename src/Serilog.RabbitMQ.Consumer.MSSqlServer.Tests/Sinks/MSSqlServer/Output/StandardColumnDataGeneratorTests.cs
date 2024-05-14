@@ -7,10 +7,9 @@ using Serilog.Parsing;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-
-namespace Serilog.Sinks.MSSqlServer.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class StandardColumnDataGeneratorTests
@@ -113,7 +112,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
            new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new PropertyToken("NumberProperty", "{NumberProperty}") }),
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
             SetupSut(new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions(), CultureInfo.InvariantCulture);
 
             // Act
@@ -138,7 +137,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                     new PropertyToken("NumberProperty", "{NumberProperty}"),
                     new TextToken(" seconds duration")
                 }),
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
 
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { Message = { DataLength = messageFieldLength } };
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
@@ -159,7 +158,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
            new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new PropertyToken("NumberProperty", "{NumberProperty}") }),
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
             SetupSut(new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions(), new CultureInfo("de-AT"));
 
             // Act
@@ -184,7 +183,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                     new PropertyToken("NumberProperty", "{NumberProperty}"),
                     new TextToken(" seconds duration")
                 }),
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
 
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { Message = { DataLength = messageFieldLength } };
             SetupSut(columnOptions, new CultureInfo("de-AT"));
@@ -205,7 +204,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
            new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, messageTemplate,
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
             SetupSut(new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions(), CultureInfo.InvariantCulture);
 
             // Act
@@ -227,7 +226,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
            new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, messageTemplate,
-                new List<LogEventProperty> { new LogEventProperty("NumberProperty", new ScalarValue(2.4)) }), "");
+                new List<LogEventProperty> { new("NumberProperty", new ScalarValue(2.4)) }), "");
 
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions { MessageTemplate = { DataLength = messageTemplateFieldLength } };
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
@@ -478,9 +477,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty("Property3", property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new("Property3", property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
@@ -507,13 +506,13 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty(additionalColumnName, property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new(additionalColumnName, property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions
             {
-                AdditionalColumns = new List<SqlColumn> { new SqlColumn { PropertyName = additionalColumnName, DataType = SqlDbType.NVarChar } }
+                AdditionalColumns = new List<SqlColumn> { new() { PropertyName = additionalColumnName, DataType = SqlDbType.NVarChar } }
             };
             columnOptions.Properties.ExcludeAdditionalProperties = true;
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
@@ -540,13 +539,13 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty(additionalColumnName, property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new(additionalColumnName, property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions
             {
-                AdditionalColumns = new List<SqlColumn> { new SqlColumn { PropertyName = additionalColumnName, DataType = SqlDbType.NVarChar } }
+                AdditionalColumns = new List<SqlColumn> { new() { PropertyName = additionalColumnName, DataType = SqlDbType.NVarChar } }
             };
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
 
@@ -571,9 +570,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty("Property3", property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new("Property3", property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.PropertiesFilter = k => k != "Property2";
@@ -597,9 +596,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", new ScalarValue("1")),
-                    new LogEventProperty("Property2", new ScalarValue(2)),
-                    new LogEventProperty("Property3", new ScalarValue("Three"))
+                    new("Property1", new ScalarValue("1")),
+                    new("Property2", new ScalarValue(2)),
+                    new("Property3", new ScalarValue("Three"))
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             SetupSut(columnOptions, CultureInfo.InvariantCulture);
@@ -624,9 +623,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty("Property3", property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new("Property3", property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.UsePropertyKeyAsElementName = true;
@@ -654,9 +653,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty("Property3", property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new("Property3", property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.UsePropertyKeyAsElementName = true;
@@ -685,9 +684,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", property1Value),
-                    new LogEventProperty("Property2", property2Value),
-                    new LogEventProperty("Property3", property3Value)
+                    new("Property1", property1Value),
+                    new("Property2", property2Value),
+                    new("Property3", property3Value)
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.UsePropertyKeyAsElementName = true;
@@ -714,9 +713,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", new ScalarValue("1")),
-                    new LogEventProperty("Property2", new ScalarValue("2")),
-                    new LogEventProperty("Property3", new ScalarValue("3"))
+                    new("Property1", new ScalarValue("1")),
+                    new("Property2", new ScalarValue("2")),
+                    new("Property3", new ScalarValue("3"))
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.RootElementName = "Root";
@@ -744,9 +743,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>() { new TextToken("Test message") }),
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("Property1", new ScalarValue("1")),
-                    new LogEventProperty("Property2", new ScalarValue("2")),
-                    new LogEventProperty("Property3", new ScalarValue("3"))
+                    new("Property1", new ScalarValue("1")),
+                    new("Property2", new ScalarValue("2")),
+                    new("Property3", new ScalarValue("3"))
                 }), "");
             var columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             columnOptions.Properties.RootElementName = "Root";
@@ -769,7 +768,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             const string testLogEventContent = "Content of LogEvent";
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             options.Store.Add(StandardColumn.LogEvent);
-            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString>();
+            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString?>();
             logEventFormatterMock.Setup(f => f.Format(It.IsAny<LogEventWithExceptionAsJsonString>(), It.IsAny<TextWriter>()))
                 .Callback<LogEvent, TextWriter>((e, w) => w.Write(testLogEventContent));
             var logEvent = CreateLogEvent(DateTimeOffset.UtcNow);
@@ -789,15 +788,15 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             const string additionalColumnName = "AdditionalColumn1";
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions
             {
-                AdditionalColumns = new List<SqlColumn> { new SqlColumn(additionalColumnName, SqlDbType.NVarChar) }
+                AdditionalColumns = new List<SqlColumn> { new(additionalColumnName, SqlDbType.NVarChar) }
             };
             options.LogEvent.ExcludeAdditionalProperties = true;
             options.Store.Add(StandardColumn.LogEvent);
-            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString>();
+            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString?>();
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
                 new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>()),
-                new List<LogEventProperty> { new LogEventProperty(additionalColumnName, new ScalarValue("1234")) }), "");
+                new List<LogEventProperty> { new(additionalColumnName, new ScalarValue("1234")) }), "");
             SetupSut(options, CultureInfo.InvariantCulture, logEventFormatter: logEventFormatterMock.Object);
 
             // Act
@@ -816,14 +815,14 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             const string additionalColumnName = "AdditionalColumn1";
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions
             {
-                AdditionalColumns = new List<SqlColumn> { new SqlColumn(additionalColumnName, SqlDbType.NVarChar) }
+                AdditionalColumns = new List<SqlColumn> { new(additionalColumnName, SqlDbType.NVarChar) }
             };
             options.Store.Add(StandardColumn.LogEvent);
-            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString>();
+            var logEventFormatterMock = new Mock<ITextFormatterLogEventWithExceptionAsJsonString?>();
             var logEvent = new LogEventWithExceptionAsJsonString(new LogEvent(
                 new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero),
                 LogEventLevel.Debug, null, new MessageTemplate(new List<MessageTemplateToken>()),
-                new List<LogEventProperty> { new LogEventProperty(additionalColumnName, new ScalarValue("1234")) }), "");
+                new List<LogEventProperty> { new(additionalColumnName, new ScalarValue("1234")) }), "");
             SetupSut(options, CultureInfo.InvariantCulture, logEventFormatter: logEventFormatterMock.Object);
 
             // Act
@@ -855,9 +854,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
         private void SetupSut(
             Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions options,
             IFormatProvider formatProvider = null,
-            ITextFormatterLogEventWithExceptionAsJsonString logEventFormatter = null)
+            ITextFormatterLogEventWithExceptionAsJsonString? logEventFormatter = null)
         {
-            _sut = new StandardColumnDataGenerator(options, _xmlPropertyFormatterMock.Object, logEventFormatter);
+            _sut = new StandardColumnDataGenerator(options, _xmlPropertyFormatterMock.Object);
         }
     }
 }

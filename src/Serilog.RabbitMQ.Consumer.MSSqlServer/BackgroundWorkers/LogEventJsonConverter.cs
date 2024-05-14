@@ -72,9 +72,16 @@ public class LogEventJsonConverter : JsonConverter<LogEventWithExceptionAsJsonSt
                 }
 
                 var name = property.Name;
-                var value = property.Value.ToString();
 
-                logEventPropertyValues.Add(name, new ScalarValue(value));
+                if (property.Value.ValueKind == JsonValueKind.Null)
+                {
+                    logEventPropertyValues.Add(name, new ScalarValue(null));
+                }
+                else
+                {
+                    var value = property.Value.ToString();
+                    logEventPropertyValues.Add(name, new ScalarValue(value));
+                }
             }
         }
 

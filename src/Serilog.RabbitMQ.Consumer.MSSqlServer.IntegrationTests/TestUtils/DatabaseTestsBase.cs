@@ -1,14 +1,20 @@
-﻿using System.Globalization;
+﻿extern alias ConsumerAlias;
+using System.Globalization;
 using Dapper;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.Setup;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
+using Testcontainers.MsSql;
 using Xunit.Abstractions;
+using Xunit.Sdk;
+using SqlColumn = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.SqlColumn;
 
-namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.TestUtils
 {
     [Collection("DatabaseTests")]
-    public abstract class DatabaseTestsBase : IDisposable
+    public abstract class DatabaseTestsBase : TestContainersBase, IDisposable
     {
         private readonly ITestOutputHelper _output;
         private bool _disposedValue;
@@ -20,6 +26,23 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
             Serilog.Debugging.SelfLog.Enable(_output.WriteLine);
         }
 
+        protected async Task InitializeAsync(Func<IServiceCollection, bool>? registerCustomIocForConsumer = null)
+        {
+            await MsSqlContainer.StartAsync();
+            await RabbitMqContainer.StartAsync();
+
+            var producerWebApplicationFactory = new ProducerWebApplicationFactory(MsSqlContainer.GetConnectionString(), new NullMessageSink());
+            ProducerHttpClient = producerWebApplicationFactory.CreateClient();
+
+            var consumerWebApplicationFactory = new ConsumerWebApplicationFactory(MsSqlContainer.GetConnectionString(), new NullMessageSink(), registerCustomIocForConsumer);
+            ConsumerHttpClient = consumerWebApplicationFactory.CreateClient();
+        }
+
+        protected async Task DisposeAsync()
+        {
+            await MsSqlContainer.DisposeAsync().AsTask();
+            await RabbitMqContainer.DisposeAsync().AsTask();
+        }
         protected static void VerifyDatabaseColumnsWereCreated(IEnumerable<string> columnNames)
         {
             if (columnNames == null)
@@ -27,7 +50,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
                 return;
             }
 
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<InfoSchema>($@"SELECT COLUMN_NAME AS ColumnName FROM {DatabaseFixture.Database}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{DatabaseFixture.LogTableName}'");
                 var infoSchema = logEvents as InfoSchema[] ?? logEvents.ToArray();
@@ -48,7 +71,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
                 return;
             }
 
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<InfoSchema>($@"SELECT COLUMN_NAME AS ColumnName, UPPER(DATA_TYPE) as DataType, CHARACTER_MAXIMUM_LENGTH as DataLength, IS_NULLABLE as AllowNull
                     FROM {DatabaseFixture.Database}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{DatabaseFixture.LogTableName}'");
@@ -78,9 +101,9 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyIdColumnWasCreatedAndHasIdentity(string idColumnName = "Id")
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
-                var logEvents = conn.Query<InfoSchema>($@"SELECT COLUMN_NAME AS ColumnName FROM {DatabaseFixture.Database}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{DatabaseFixture.LogTableName}'");
+                var logEvents = conn.Query<InfoSchema>($@"SELECT COLUMN_NAME AS ColumnName FROM {MsSqlBuilder.DefaultDatabase}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{DatabaseFixture.LogTableName}'");
                 var infoSchema = logEvents as InfoSchema[] ?? logEvents.ToArray();
 
                 infoSchema.Should().Contain(columns => columns.ColumnName == idColumnName);
@@ -98,7 +121,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyCustomLogMessageWasWritten(string expectedMessage)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<CustomStandardLogColumns>($"SELECT CustomMessage FROM {DatabaseFixture.LogTableName}");
 
@@ -108,7 +131,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyStringColumnWritten(string columnName, string expectedValue)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<string>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
 
@@ -121,7 +144,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
             List<string> valuesWritten,
             List<string> valuesNotWritten)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<string>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
 
@@ -132,7 +155,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyIntegerColumnWritten(string columnName, int expectedValue)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<int>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
 
@@ -142,7 +165,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyColumnStoreIndex()
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 conn.Execute($"use {DatabaseFixture.Database}");
                 var query = conn.Query<SysIndex_CCI>("select name from sys.indexes where type = 5");
@@ -154,7 +177,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void VerifyCustomQuery<TColumnDefinition>(string query, Action<IEnumerable<TColumnDefinition>> validationAction)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 var logEvents = conn.Query<TColumnDefinition>(query);
                 validationAction?.Invoke(logEvents);
@@ -163,7 +186,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
 
         protected static void CreateTrigger(string logTriggerTableName, string logTriggerName)
         {
-            using (var conn = new SqlConnection(DatabaseFixture.LogEventsConnectionString))
+            using (var conn = new SqlConnection(MsSqlContainer.GetConnectionString()))
             {
                 conn.Execute($"CREATE TABLE {logTriggerTableName} ([Id] [UNIQUEIDENTIFIER] NOT NULL, [Data] [NVARCHAR](50) NOT NULL)");
                 conn.Execute($@"

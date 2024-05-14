@@ -1,7 +1,7 @@
 using Serilog.RabbitMQ.Consumer.MSSqlServer.Extensions;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Extensions
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Extensions
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class StringExtensionsTests

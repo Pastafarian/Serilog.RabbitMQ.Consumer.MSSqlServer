@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Serilog.Sinks.MSSqlServer.Platform;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Xunit;
+﻿using System.Data;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Platform
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class DataTableCreatorTests
     {
         private const string _tableName = "TestTableName";
-        private readonly Serilog.Sinks.MSSqlServer.ColumnOptions _columnOptions;
+        private readonly Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _columnOptions;
         private DataTableCreator _sut;
 
         public DataTableCreatorTests()
         {
-            _columnOptions = new Serilog.Sinks.MSSqlServer.ColumnOptions();
+            _columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
         }
 
         [Fact]

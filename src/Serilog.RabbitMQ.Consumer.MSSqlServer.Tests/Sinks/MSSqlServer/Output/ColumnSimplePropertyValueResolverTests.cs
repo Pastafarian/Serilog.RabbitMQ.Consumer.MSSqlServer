@@ -2,9 +2,9 @@
 using Serilog.Events;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class ColumnSimplePropertyValueResolverTests

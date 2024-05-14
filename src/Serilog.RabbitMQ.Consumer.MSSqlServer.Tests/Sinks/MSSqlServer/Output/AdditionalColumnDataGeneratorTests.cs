@@ -3,10 +3,9 @@ using Moq;
 using Serilog.Events;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-
-namespace Serilog.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class AdditionalColumnDataGeneratorTests

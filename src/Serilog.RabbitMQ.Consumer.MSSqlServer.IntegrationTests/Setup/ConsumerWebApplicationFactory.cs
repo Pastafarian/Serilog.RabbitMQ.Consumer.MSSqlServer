@@ -1,6 +1,4 @@
 extern alias ConsumerAlias;
-using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
-using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies;
 using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.Setup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -16,21 +14,21 @@ using Program = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.Program;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.Setup;
 
-public class ConsumerWebApplicationFactory(string connectionString, IMessageSink output) : WebApplicationFactory<Program>
+public class ConsumerWebApplicationFactory(string connectionString, IMessageSink output, Func<IServiceCollection, bool>? registerCustomIoc = null) : WebApplicationFactory<Program>
 {
+    public Func<IServiceCollection, bool>? RegisterCustomIoc { get; } = registerCustomIoc;
     public IMessageSink Output = output;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
             {
-                services.RemoveAll(typeof(SinkDependencies));
-
-                var sinkDependencies = SinkDependenciesFactory.Create(connectionString,
-                    new MSSqlServerSinkOptions("ApiLogs", 1000, TimeSpan.FromSeconds(5), true, true, "dbo"), null,
-                    WebApplicationBuilderExtensions.ColumnOptions, null);
-
-                services.AddSingleton(sinkDependencies);
+                services.RemoveAll(typeof(ConnectionString));
+                services.AddScoped<ConnectionString>(_ => new ConnectionString(connectionString, "Logs"));
+                if (RegisterCustomIoc != null)
+                {
+                    RegisterCustomIoc(services);
+                }
             }
         );
 
@@ -38,7 +36,7 @@ public class ConsumerWebApplicationFactory(string connectionString, IMessageSink
         {
             using var loggerFactory = new LoggerFactory();
             loggerFactory.AddXUnit(Output, c => c.MessageSinkMessageFactory = m => new PrintableDiagnosticMessage(m))
-                .CreateLogger<EndToEndTests>();
+                        .CreateLogger<EndToEndTests>();
             logging.AddXUnit(Output);
             logging.AddSerilog();
             logging.ClearProviders(); // Remove other loggers

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Testcontainers.MsSql;
 using static System.FormattableString;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
@@ -8,7 +9,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
     public sealed class DatabaseFixture : IDisposable
     {
 
-        private const string _masterConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Master;Integrated Security=True;Connect Timeout=120";
+        private static readonly string _masterConnectionString = LogEventsConnectionString;
         private const string _createLogEventsDatabase = @"
 EXEC ('CREATE DATABASE [{0}] ON PRIMARY 
 	(NAME = [{0}], 
@@ -25,11 +26,11 @@ WITH ROLLBACK IMMEDIATE
 DROP DATABASE [{Database}]
 ");
 
-        public static string Database => "LogTest";
+        public static string Database => MsSqlBuilder.DefaultDatabase;
         public static string LogTableName => "LogEvents";
-        public static string LogEventsConnectionString => Invariant($@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={Database};Integrated Security=True");
+        public static string LogEventsConnectionString { get; set; }
 
-        public DatabaseFixture()
+        public DatabaseFixture(string logEventsConnectionString)
         {
             CreateDatabase();
         }

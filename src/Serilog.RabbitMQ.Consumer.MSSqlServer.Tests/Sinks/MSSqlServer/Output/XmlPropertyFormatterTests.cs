@@ -1,8 +1,8 @@
 ﻿using Serilog.Events;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class XmlPropertyFormatterTests
@@ -27,8 +27,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("Value1")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue(2))
+                new(new ScalarValue("Key1"), new ScalarValue("Value1")),
+                new(new ScalarValue("Key2"), new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
@@ -46,8 +46,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("Value1")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue(2))
+                new(new ScalarValue("Key1"), new ScalarValue("Value1")),
+                new(new ScalarValue("Key2"), new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
@@ -65,7 +65,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("some<allowed>words&inbetween"))
+                new(new ScalarValue("Key1"), new ScalarValue("some<allowed>words&inbetween"))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
@@ -83,7 +83,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("some<allowed>words&inbetween"), new ScalarValue("Value1"))
+                new(new ScalarValue("some<allowed>words&inbetween"), new ScalarValue("Value1"))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
@@ -101,9 +101,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue(string.Empty)),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue("Value2")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key3"), new ScalarValue(null))
+                new(new ScalarValue("Key1"), new ScalarValue(string.Empty)),
+                new(new ScalarValue("Key2"), new ScalarValue("Value2")),
+                new(new ScalarValue("Key3"), new ScalarValue(null))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
             var sut = new XmlPropertyFormatter();
@@ -121,8 +121,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("Value1")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue(2))
+                new(new ScalarValue("Key1"), new ScalarValue("Value1")),
+                new(new ScalarValue("Key2"), new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { ItemElementName = "customitem" };
             var sut = new XmlPropertyFormatter();
@@ -140,8 +140,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("Value1")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue("Value2"))
+                new(new ScalarValue("Key1"), new ScalarValue("Value1")),
+                new(new ScalarValue("Key2"), new ScalarValue("Value2"))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitDictionaryContainerElement = true };
             var sut = new XmlPropertyFormatter();
@@ -159,8 +159,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new DictionaryValue(new List<KeyValuePair<ScalarValue, LogEventPropertyValue>>
             {
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key1"), new ScalarValue("Value1")),
-                new KeyValuePair<ScalarValue, LogEventPropertyValue>(new ScalarValue("Key2"), new ScalarValue("Value2"))
+                new(new ScalarValue("Key1"), new ScalarValue("Value1")),
+                new(new ScalarValue("Key2"), new ScalarValue("Value2"))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { DictionaryElementName = "list" };
             var sut = new XmlPropertyFormatter();
@@ -292,8 +292,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue("Value1")),
-                new LogEventProperty("Key2", new ScalarValue(2))
+                new("Key1", new ScalarValue("Value1")),
+                new("Key2", new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
@@ -311,8 +311,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue("Value1")),
-                new LogEventProperty("Key2", new ScalarValue(2))
+                new("Key1", new ScalarValue("Value1")),
+                new("Key2", new ScalarValue(2))
             }, "structuretype");
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
@@ -330,7 +330,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("xml Key With Space", new ScalarValue("Value1"))
+                new("xml Key With Space", new ScalarValue("Value1"))
             }, "5structure\ttype");
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
@@ -348,9 +348,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue(string.Empty)),
-                new LogEventProperty("Key2", new ScalarValue("Value2")),
-                new LogEventProperty("Key3", new ScalarValue(null))
+                new("Key1", new ScalarValue(string.Empty)),
+                new("Key2", new ScalarValue("Value2")),
+                new("Key3", new ScalarValue(null))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
             var sut = new XmlPropertyFormatter();
@@ -368,8 +368,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue("Value1")),
-                new LogEventProperty("Key2", new ScalarValue(2))
+                new("Key1", new ScalarValue("Value1")),
+                new("Key2", new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { PropertyElementName = "propertyitem" };
             var sut = new XmlPropertyFormatter();
@@ -387,8 +387,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue("Value1")),
-                new LogEventProperty("Key2", new ScalarValue(2))
+                new("Key1", new ScalarValue("Value1")),
+                new("Key2", new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitStructureContainerElement = true };
             var sut = new XmlPropertyFormatter();
@@ -406,8 +406,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             // Arrange
             var input = new StructureValue(new List<LogEventProperty>
             {
-                new LogEventProperty("Key1", new ScalarValue("Value1")),
-                new LogEventProperty("Key2", new ScalarValue(2))
+                new("Key1", new ScalarValue("Value1")),
+                new("Key2", new ScalarValue(2))
             });
             var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { StructureElementName = "propertylist" };
             var sut = new XmlPropertyFormatter();

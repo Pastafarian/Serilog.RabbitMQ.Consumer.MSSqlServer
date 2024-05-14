@@ -6,6 +6,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.RabbitMQ
     public interface IRabbitConnectionFactory : IDisposable
     {
         Task<IConnection> GetConnectionAsync();
+        IConnectionFactory GetConnectionFactory();
         void Close();
     }
 
@@ -45,7 +46,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.RabbitMQ
         /// Configures a new ConnectionFactory, and returns it
         /// </summary>
         /// <returns></returns>
-        private IConnectionFactory GetConnectionFactory()
+        public IConnectionFactory GetConnectionFactory()
         {
             // prepare connection factory
             var connectionFactory = new ConnectionFactory

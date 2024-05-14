@@ -2,10 +2,9 @@
 using Serilog.Events;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-
-namespace Serilog.Sinks.MSSqlServer.Tests.Output
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class ColumnHierarchicalPropertyValueResolverTests
@@ -116,18 +115,18 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             _properties.Add("Property1", new StructureValue(
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("SubProperty11", new StructureValue(
+                    new("SubProperty11", new StructureValue(
                         new List<LogEventProperty>
                         {
-                            new LogEventProperty("SubSubProperty111", new ScalarValue("SubSubValue111")),
-                            new LogEventProperty("SubSubProperty112", new ScalarValue("SubSubValue112"))
+                            new("SubSubProperty111", new ScalarValue("SubSubValue111")),
+                            new("SubSubProperty112", new ScalarValue("SubSubValue112"))
                         })
                     ),
-                    new LogEventProperty("SubProperty12", new ScalarValue("SubPropertyValue12")),
-                    new LogEventProperty("SubProperty13", new StructureValue(
+                    new("SubProperty12", new ScalarValue("SubPropertyValue12")),
+                    new("SubProperty13", new StructureValue(
                         new List<LogEventProperty>
                         {
-                            new LogEventProperty("SubSubProperty131", new ScalarValue("SubSubValue131"))
+                            new("SubSubProperty131", new ScalarValue("SubSubValue131"))
                         })
                     ),
                 }));
@@ -135,26 +134,26 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Output
             _properties.Add("Property3", new StructureValue(
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("SubProperty31", new StructureValue(
+                    new("SubProperty31", new StructureValue(
                         new List<LogEventProperty>
                         {
-                            new LogEventProperty("SubSubProperty311", new ScalarValue("SubSubValue311")),
-                            new LogEventProperty("SubSubProperty312", new ScalarValue("SubSubValue312"))
+                            new("SubSubProperty311", new ScalarValue("SubSubValue311")),
+                            new("SubSubProperty312", new ScalarValue("SubSubValue312"))
                         })
                     ),
-                    new LogEventProperty("SubProperty32", new StructureValue(
+                    new("SubProperty32", new StructureValue(
                         new List<LogEventProperty>
                         {
-                            new LogEventProperty("SubSubProperty321", new ScalarValue("SubSubValue321")),
-                            new LogEventProperty("SubSubProperty322", new ScalarValue("SubSubValue322")),
-                            new LogEventProperty("SubSubProperty323", new ScalarValue("SubSubValue323"))
+                            new("SubSubProperty321", new ScalarValue("SubSubValue321")),
+                            new("SubSubProperty322", new ScalarValue("SubSubValue322")),
+                            new("SubSubProperty323", new ScalarValue("SubSubValue323"))
                         })
                     ),
                 }));
             _properties.Add("Property4", new StructureValue(
                 new List<LogEventProperty>
                 {
-                    new LogEventProperty("SubProperty41", new ScalarValue("SubValue41"))
+                    new("SubProperty41", new ScalarValue("SubValue41"))
                 }));
         }
     }

@@ -13,11 +13,22 @@
       <None Remove="appsettings.audit.json" />
       <None Remove="appsettings.consumer.json" />
       <None Remove="appsettings.Development.json" />
+      <None Remove="appsettings.int-test.json" />
       <None Remove="appsettings.log.json" />
       <None Remove="appsettings.producer.json" />
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="appsettings.int-test.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="appsettings.log.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
       <Content Include="appsettings.audit.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -29,11 +40,6 @@
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
       <Content Include="appsettings.consumer.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Include="appsettings.log.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

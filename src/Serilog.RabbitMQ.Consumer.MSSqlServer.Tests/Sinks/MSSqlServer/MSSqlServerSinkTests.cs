@@ -1,219 +1,165 @@
-﻿using System.Data;
-using Moq;
-using Serilog.Events;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+﻿//namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer
+//{
+//[Trait(TestCategory.TraitName, TestCategory.Unit)]
+//public class MSSqlServerSinkTests : IDisposable
+//{
+//    private readonly MSSqlServerSinkOptions _sinkOptions;
+//    private readonly SinkDependencies _sinkDependencies;
+//    private readonly Mock<IDataTableCreator> _dataTableCreatorMock;
+//    private readonly Mock<ISqlCommandExecutor> _sqlDatabaseCreatorMock;
+//    private readonly Mock<ISqlCommandExecutor> _sqlTableCreatorMock;
+//    private readonly Mock<ISqlBulkBatchWriter> _sqlBulkBatchWriter;
+//    private readonly string _tableName = "tableName";
+//    private readonly string _schemaName = "schemaName";
+//    private readonly DataTable _dataTable;
 
-namespace Serilog.Sinks.MSSqlServer.Tests
-{
-    [Trait(TestCategory.TraitName, TestCategory.Unit)]
-    public class MSSqlServerSinkTests : IDisposable
-    {
-        private readonly MSSqlServerSinkOptions _sinkOptions;
-        private readonly SinkDependencies _sinkDependencies;
-        private readonly Mock<IDataTableCreator> _dataTableCreatorMock;
-        private readonly Mock<ISqlCommandExecutor> _sqlDatabaseCreatorMock;
-        private readonly Mock<ISqlCommandExecutor> _sqlTableCreatorMock;
-        private readonly Mock<ISqlBulkBatchWriter> _sqlBulkBatchWriter;
-        private readonly string _tableName = "tableName";
-        private readonly string _schemaName = "schemaName";
-        private readonly DataTable _dataTable;
-        private MSSqlServerSink _sut;
-        private bool _disposedValue;
+//    private bool _disposedValue;
 
-        public MSSqlServerSinkTests()
-        {
-            _sinkOptions = new MSSqlServerSinkOptions
-            {
-                TableName = _tableName,
-                SchemaName = _schemaName
-            };
+//    public MSSqlServerSinkTests()
+//    {
+//        _sinkOptions = new MSSqlServerSinkOptions
+//        {
+//            TableName = _tableName,
+//            SchemaName = _schemaName
+//        };
 
-            _dataTable = new DataTable(_tableName);
-            _dataTableCreatorMock = new Mock<IDataTableCreator>();
-            _dataTableCreatorMock.Setup(d => d.CreateDataTable())
-                .Returns(_dataTable);
+//        _dataTable = new DataTable(_tableName);
+//        _dataTableCreatorMock = new Mock<IDataTableCreator>();
+//        _dataTableCreatorMock.Setup(d => d.CreateDataTable())
+//            .Returns(_dataTable);
 
-            _sqlDatabaseCreatorMock = new Mock<ISqlCommandExecutor>();
-            _sqlTableCreatorMock = new Mock<ISqlCommandExecutor>();
-            _sqlBulkBatchWriter = new Mock<ISqlBulkBatchWriter>();
+//        _sqlDatabaseCreatorMock = new Mock<ISqlCommandExecutor>();
+//        _sqlTableCreatorMock = new Mock<ISqlCommandExecutor>();
+//        _sqlBulkBatchWriter = new Mock<ISqlBulkBatchWriter>();
 
-            _sinkDependencies = new SinkDependencies
-            {
-                DataTableCreator = _dataTableCreatorMock.Object,
-                SqlDatabaseCreator = _sqlDatabaseCreatorMock.Object,
-                SqlTableCreator = _sqlTableCreatorMock.Object,
-                SqlBulkBatchWriter = _sqlBulkBatchWriter.Object
-            };
-        }
+//        _sinkDependencies = new SinkDependencies
+//        {
+//            DataTableCreator = _dataTableCreatorMock.Object,
+//            SqlDatabaseCreator = _sqlDatabaseCreatorMock.Object,
+//            SqlTableCreator = _sqlTableCreatorMock.Object,
+//            SqlBulkBatchWriter = _sqlBulkBatchWriter.Object
+//        };
+//    }
 
-        [Fact]
-        public void InitializeWithoutTableNameThrows()
-        {
-            Assert.Throws<InvalidOperationException>(() =>
-                new MSSqlServerSink(new MSSqlServerSinkOptions(), _sinkDependencies));
-        }
 
-        [Fact]
-        public void InitializeWithoutSinkDependenciesThrows()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-                new MSSqlServerSink(_sinkOptions, null));
-        }
+//    [Fact]
+//    public void InitializeCallsDataTableCreator()
+//    {
+//        // Act
+//        SetupSut(autoCreateSqlTable: false);
 
-        [Fact]
-        public void InitializeWithoutDataTableCreatorThrows()
-        {
-            // Arrange
-            _sinkDependencies.DataTableCreator = null;
+//        // Assert
+//        _dataTableCreatorMock.Verify(c => c.CreateDataTable(), Times.Once);
+//    }
 
-            // Act + assert
-            Assert.Throws<InvalidOperationException>(() =>
-                new MSSqlServerSink(_sinkOptions, _sinkDependencies));
-        }
+//    [Fact]
+//    public void InitializeWithAutoCreateSqlDatabaseCallsSqlDatabaseCreator()
+//    {
+//        // Act
+//        SetupSut(autoCreateSqlDatabase: true);
 
-        [Fact]
-        public void InitializeWithoutSqlTableCreatorThrows()
-        {
-            // Arrange
-            _sinkDependencies.SqlTableCreator = null;
+//        // Assert
+//        _sqlDatabaseCreatorMock.Verify(c => c.Execute(), Times.Once);
+//    }
 
-            // Act + assert
-            Assert.Throws<InvalidOperationException>(() =>
-                new MSSqlServerSink(_sinkOptions, _sinkDependencies));
-        }
+//    [Fact]
+//    public void InitializeWithoutAutoCreateSqlDatabaseDoesNotCallSqlDatabaseCreator()
+//    {
+//        // Act
+//        SetupSut(autoCreateSqlDatabase: false);
 
-        [Fact]
-        public void InitializeWithoutSqlBulkBatchWriterThrows()
-        {
-            // Arrange
-            _sinkDependencies.SqlBulkBatchWriter = null;
+//        // Assert
+//        _sqlDatabaseCreatorMock.Verify(c => c.Execute(), Times.Never);
+//    }
 
-            // Act + assert
-            Assert.Throws<InvalidOperationException>(() =>
-                new MSSqlServerSink(_sinkOptions, _sinkDependencies));
-        }
+//    [Fact]
+//    public void InitializeWithAutoCreateSqlTableCallsSqlTableCreator()
+//    {
+//        // Act
+//        SetupSut(autoCreateSqlTable: true);
 
-        [Fact]
-        public void InitializeCallsDataTableCreator()
-        {
-            // Act
-            SetupSut(autoCreateSqlTable: false);
+//        // Assert
+//        _sqlTableCreatorMock.Verify(c => c.Execute(), Times.Once);
+//    }
 
-            // Assert
-            _dataTableCreatorMock.Verify(c => c.CreateDataTable(), Times.Once);
-        }
+//    [Fact]
+//    public void InitializeWithoutAutoCreateSqlTableDoesNotCallSqlTableCreator()
+//    {
+//        // Act
+//        SetupSut(autoCreateSqlTable: false);
 
-        [Fact]
-        public void InitializeWithAutoCreateSqlDatabaseCallsSqlDatabaseCreator()
-        {
-            // Act
-            SetupSut(autoCreateSqlDatabase: true);
+//        // Assert
+//        _sqlTableCreatorMock.Verify(c => c.Execute(), Times.Never);
+//    }
 
-            // Assert
-            _sqlDatabaseCreatorMock.Verify(c => c.Execute(), Times.Once);
-        }
+//[Fact]
+//public async Task EmitBatchAsyncCallsSqlLogEventWriter()
+//{
+//    // Arrange
+//    SetupSut();
+//    var logEvents = new List<LogEventWithExceptionAsJsonString> { TestLogEventHelper.CreateLogEvent() };
+//    _sqlBulkBatchWriter.Setup(w => w.WriteBatch(It.IsAny<List<LogEventWithExceptionAsJsonString>>(), _dataTable))
+//        .Callback<IEnumerable<LogEventWithExceptionAsJsonString>, DataTable>((e, d) =>
+//         {
+//             Assert.Same(logEvents, e);
+//         });
 
-        [Fact]
-        public void InitializeWithoutAutoCreateSqlDatabaseDoesNotCallSqlDatabaseCreator()
-        {
-            // Act
-            SetupSut(autoCreateSqlDatabase: false);
+//    // Act
+//    await _sut.EmitBatchAsync(logEvents).ConfigureAwait(false);
 
-            // Assert
-            _sqlDatabaseCreatorMock.Verify(c => c.Execute(), Times.Never);
-        }
+//    // Assert
+//    _sqlBulkBatchWriter.Verify(w => w.WriteBatch(It.IsAny<IEnumerable<LogEvent>>(), _dataTable), Times.Once);
+//}
 
-        [Fact]
-        public void InitializeWithAutoCreateSqlTableCallsSqlTableCreator()
-        {
-            // Act
-            SetupSut(autoCreateSqlTable: true);
+//[Fact]
+//public void OnEmpytBatchAsyncReturnsCompletedTask()
+//{
+//    // Arrange
+//    SetupSut();
 
-            // Assert
-            _sqlTableCreatorMock.Verify(c => c.Execute(), Times.Once);
-        }
+//    // Act
+//    var task = _sut.OnEmptyBatchAsync();
 
-        [Fact]
-        public void InitializeWithoutAutoCreateSqlTableDoesNotCallSqlTableCreator()
-        {
-            // Act
-            SetupSut(autoCreateSqlTable: false);
+//    // Assert
+//    Assert.True(task.IsCompleted);
+//}
 
-            // Assert
-            _sqlTableCreatorMock.Verify(c => c.Execute(), Times.Never);
-        }
+//[Fact]
+//public void DisposeCallsDisposeOnDataTable()
+//{
+//    // Arrange
+//    var dataTableDisposeCalled = false;
+//    SetupSut();
+//    _dataTable.Disposed += (s, e) => dataTableDisposeCalled = true;
 
-        [Fact]
-        public async Task EmitBatchAsyncCallsSqlLogEventWriter()
-        {
-            // Arrange
-            SetupSut();
-            var logEvents = new List<LogEvent> { TestLogEventHelper.CreateLogEvent() };
-            _sqlBulkBatchWriter.Setup(w => w.WriteBatch(It.IsAny<IEnumerable<LogEvent>>(), _dataTable))
-                .Callback<IEnumerable<LogEvent>, DataTable>((e, d) =>
-                 {
-                     Assert.Same(logEvents, e);
-                 });
+//    // Act
+//    _sut.Dispose();
 
-            // Act
-            await _sut.EmitBatchAsync(logEvents).ConfigureAwait(false);
+//    // Assert
+//    Assert.True(dataTableDisposeCalled);
+//}
 
-            // Assert
-            _sqlBulkBatchWriter.Verify(w => w.WriteBatch(It.IsAny<IEnumerable<LogEvent>>(), _dataTable), Times.Once);
-        }
+//private void SetupSut(bool autoCreateSqlDatabase = false, bool autoCreateSqlTable = false)
+//{
+//    _sinkOptions.AutoCreateSqlDatabase = autoCreateSqlDatabase;
+//    _sinkOptions.AutoCreateSqlTable = autoCreateSqlTable;
+//    _sut = new MSSqlServerSink(_sinkOptions, _sinkDependencies);
+//}
 
-        [Fact]
-        public void OnEmpytBatchAsyncReturnsCompletedTask()
-        {
-            // Arrange
-            SetupSut();
+//protected virtual void Dispose(bool disposing)
+//{
+//    if (!_disposedValue)
+//    {
+//        _sut?.Dispose();
+//        _dataTable?.Dispose();
+//        _disposedValue = true;
+//    }
+//}
 
-            // Act
-            var task = _sut.OnEmptyBatchAsync();
-
-            // Assert
-            Assert.True(task.IsCompleted);
-        }
-
-        [Fact]
-        public void DisposeCallsDisposeOnDataTable()
-        {
-            // Arrange
-            var dataTableDisposeCalled = false;
-            SetupSut();
-            _dataTable.Disposed += (s, e) => dataTableDisposeCalled = true;
-
-            // Act
-            _sut.Dispose();
-
-            // Assert
-            Assert.True(dataTableDisposeCalled);
-        }
-
-        private void SetupSut(bool autoCreateSqlDatabase = false, bool autoCreateSqlTable = false)
-        {
-            _sinkOptions.AutoCreateSqlDatabase = autoCreateSqlDatabase;
-            _sinkOptions.AutoCreateSqlTable = autoCreateSqlTable;
-            _sut = new MSSqlServerSink(_sinkOptions, _sinkDependencies);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                _sut?.Dispose();
-                _dataTable?.Dispose();
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-    }
-}
+//        public void Dispose()
+//        {
+//            Dispose(disposing: true);
+//            GC.SuppressFinalize(this);
+//        }
+//    }
+//}

@@ -12,8 +12,9 @@ public sealed class EndToEndTests(ProducerAndConsumerFixture fixture) : IClassFi
     [Fact]
     public async Task GivenAuditLogsGenerated_WhenMessagePublished_ThenConsumedAndLogsStoredToTheDatabase()
     {
+
         // Arrange
-        var connectionString = fixture.MsSqlContainer.GetConnectionString();
+        var connectionString = TestContainersBase.MsSqlContainer.GetConnectionString();
         var auditMessage1 = $"unique-message-{Guid.NewGuid()}";
         var auditMessage2 = $"unique-message-{Guid.NewGuid()}";
 
@@ -27,7 +28,7 @@ public sealed class EndToEndTests(ProducerAndConsumerFixture fixture) : IClassFi
 
         // Assert
         var connection = new SqlConnection(connectionString);
-        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[ApiLogs] WHERE Exception like @n OR Exception like @y", new { n = "%" + auditMessage1 + "%", y = "%" + auditMessage2 + "%" });
+        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + auditMessage1 + "%", y = "%" + auditMessage2 + "%" });
 
         rows.Should().HaveCount(2);
     }
@@ -37,7 +38,7 @@ public sealed class EndToEndTests(ProducerAndConsumerFixture fixture) : IClassFi
     public async Task GivenLogsGenerated_WhenMessagePublished_ThenConsumedAndLogsStoredToTheDatabase()
     {
         // Arrange
-        var connectionString = fixture.MsSqlContainer.GetConnectionString();
+        var connectionString = TestContainersBase.MsSqlContainer.GetConnectionString();
         var logMessage1 = $"unique-message-{Guid.NewGuid()}";
         var logMessage2 = $"unique-message-{Guid.NewGuid()}";
 
@@ -47,11 +48,11 @@ public sealed class EndToEndTests(ProducerAndConsumerFixture fixture) : IClassFi
             await fixture.ProducerHttpClient.GetAsync("LogException?message=" + logMessage1);
             await fixture.ProducerHttpClient.GetAsync("LogException?message=" + logMessage2);
         }
-        await Task.Delay(3000);
+        await Task.Delay(7000);
 
         // Assert
         var connection = new SqlConnection(connectionString);
-        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[ApiLogs] WHERE Exception like @n OR Exception like @y", new { n = "%" + logMessage1 + "%", y = "%" + logMessage2 + "%" });
+        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + logMessage1 + "%", y = "%" + logMessage2 + "%" });
 
         rows.Should().HaveCount(2);
     }

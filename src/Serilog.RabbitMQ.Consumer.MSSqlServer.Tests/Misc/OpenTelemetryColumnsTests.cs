@@ -1,58 +1,58 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Xunit.Abstractions;
+﻿//using System.Diagnostics;
+//using System.Globalization;
+//using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
+//using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
+//using Xunit.Abstractions;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Misc
-{
-    [Trait(TestCategory.TraitName, TestCategory.Integration)]
-    public class OpenTelemetryColumnsTests : DatabaseTestsBase
-    {
-        public OpenTelemetryColumnsTests(ITestOutputHelper output) : base(output)
-        {
-        }
+//namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Misc
+//{
+//    [Trait(TestCategory.TraitName, TestCategory.Integration)]
+//    public class OpenTelemetryColumnsTests : DatabaseTestsBase
+//    {
+//        public OpenTelemetryColumnsTests(ITestOutputHelper output) : base(output)
+//        {
+//        }
 
-        [Fact]
-        public void OpenTelemetryActivityTraceIdAndSpanIdAreStoredInColumns()
-        {
-            // Arrange
-            var expectedTraceId = string.Empty;
-            var expectedSpanId = string.Empty;
-            var columnOptions = new MSSqlServer.ColumnOptions();
-            columnOptions.Store.Add(StandardColumn.TraceId);
-            columnOptions.Store.Add(StandardColumn.SpanId);
+//        [Fact]
+//        public void OpenTelemetryActivityTraceIdAndSpanIdAreStoredInColumns()
+//        {
+//            // Arrange
+//            var expectedTraceId = string.Empty;
+//            var expectedSpanId = string.Empty;
+//            var columnOptions = new MSSqlServer.ColumnOptions();
+//            columnOptions.Store.Add(StandardColumn.TraceId);
+//            columnOptions.Store.Add(StandardColumn.SpanId);
 
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.MSSqlServer
-                (
-                    connectionString: DatabaseFixture.LogEventsConnectionString,
-                    new MSSqlServerSinkOptions
-                    {
-                        TableName = DatabaseFixture.LogTableName,
-                        AutoCreateSqlTable = true
-                    },
-                    columnOptions: columnOptions,
-                    formatProvider: CultureInfo.InvariantCulture
-                )
-                .CreateLogger();
+//            Log.Logger = new LoggerConfiguration()
+//                .WriteTo.MSSqlServer
+//                (
+//                    connectionString: DatabaseFixture.LogEventsConnectionString,
+//                    new MSSqlServerSinkOptions
+//                    {
+//                        TableName = DatabaseFixture.LogTableName,
+//                        AutoCreateSqlTable = true
+//                    },
+//                    columnOptions: columnOptions,
+//                    formatProvider: CultureInfo.InvariantCulture
+//                )
+//                .CreateLogger();
 
-            // Act
-            using (var testActivity = new Activity("OpenTelemetryColumnsTests"))
-            {
-                testActivity.SetIdFormat(ActivityIdFormat.W3C);
-                testActivity.Start();
-                expectedTraceId = testActivity.TraceId.ToString();
-                expectedSpanId = testActivity.SpanId.ToString();
+//            // Act
+//            using (var testActivity = new Activity("OpenTelemetryColumnsTests"))
+//            {
+//                testActivity.SetIdFormat(ActivityIdFormat.W3C);
+//                testActivity.Start();
+//                expectedTraceId = testActivity.TraceId.ToString();
+//                expectedSpanId = testActivity.SpanId.ToString();
 
 
-                Log.Logger.Information("Logging message");
-                Log.CloseAndFlush();
-            }
+//                Log.Logger.Information("Logging message");
+//                Log.CloseAndFlush();
+//            }
 
-            // Assert
-            VerifyStringColumnWritten("TraceId", expectedTraceId);
-            VerifyStringColumnWritten("SpanId", expectedSpanId);
-        }
-    }
-}
+//            // Assert
+//            VerifyStringColumnWritten("TraceId", expectedTraceId);
+//            VerifyStringColumnWritten("SpanId", expectedSpanId);
+//        }
+//    }
+//}

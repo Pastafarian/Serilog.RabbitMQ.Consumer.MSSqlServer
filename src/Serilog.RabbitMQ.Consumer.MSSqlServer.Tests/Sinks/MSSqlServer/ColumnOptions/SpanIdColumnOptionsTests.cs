@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.ColumnOptions
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOptions
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SpanIdColumnOptionsTests

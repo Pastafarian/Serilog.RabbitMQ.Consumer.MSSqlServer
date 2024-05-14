@@ -1,54 +1,23 @@
 ﻿using System.Data;
 using Microsoft.OpenApi.Models;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.RabbitMQ;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
 {
+    public interface IColumnOptionsProvider
+    {
+        ColumnOptions ColumnOptions { get; }
+    }
+
     public static class WebApplicationBuilderExtensions
     {
-        public static ColumnOptions ColumnOptions = new()
-        {
-            AdditionalColumns =
-            [
-                new() { ColumnName = "Thread", PropertyName = "ThreadId", DataType = SqlDbType.Int, AllowNull = true },
-                new()
-                {
-                    ColumnName = "Server", PropertyName = "MachineName", DataType = SqlDbType.NVarChar, DataLength = 64,
-                    AllowNull = true
-                },
-                new()
-                {
-                    ColumnName = "Logger", PropertyName = "SourceContext", DataType = SqlDbType.NVarChar,
-                    DataLength = 64, AllowNull = true
-                },
-                new()
-                {
-                    ColumnName = "RequestUrl", PropertyName = "RequestUrl", DataType = SqlDbType.NVarChar,
-                    DataLength = 64, AllowNull = true
-                },
-                new()
-                {
-                    ColumnName = "CorrelationId", PropertyName = "CorrelationId", DataType = SqlDbType.UniqueIdentifier,
-                    AllowNull = true
-                },
-                new()
-                {
-                    ColumnName = "ExternalCorrelationId", PropertyName = "ExternalCorrelationId",
-                    DataType = SqlDbType.UniqueIdentifier, DataLength = 64, AllowNull = true
-                },
-                new()
-                {
-                    ColumnName = "PublishTimestamp", PropertyName = "PublishTimestamp",
-                    DataType = SqlDbType.DateTimeOffset, AllowNull = true
-                }
-            ]
-        };
 
-        public static WebApplicationBuilder SetupServices(this WebApplicationBuilder builder, MSSqlServerSinkOptions sinkOptions)
+
+        public static WebApplicationBuilder SetupServices(this WebApplicationBuilder builder)
         {
             var rabbitMqConfig = builder.Configuration.GetSection("RabbitMq") ?? throw new InvalidOperationException("RabbitMq Configuration Null");
 
@@ -60,8 +29,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
 
 
             // Customise TimeStamp column name
-            ColumnOptions.TimeStamp.ColumnName = "DequeueTimestamp";
-            ColumnOptions.TimeStamp.DataType = SqlDbType.DateTimeOffset;
+
 
             builder.Services.AddSingleton(rabbitMqClientConsumerConfiguration);
             builder.Services.AddControllers();
@@ -83,12 +51,19 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
                 .AddRabbitMQ()
                 .AddSqlServer(conStr);
 
+            builder.Services.AddTransient(_ => new ConnectionString(conStr, "Logs"));
+
+
             builder.Services.AddTransient<IRabbitConnectionFactory, RabbitConnectionFactory>();
+            builder.Services.AddTransient((s) => s.GetService<IRabbitConnectionFactory>()!.GetConnectionFactory());
             builder.Services.AddTransient<IAsyncEventingBasicConsumerFactory, AsyncEventingBasicConsumerFactory>();
-            builder.Services.AddTransient(_ => SinkDependenciesFactory.Create(
-                conStr, sinkOptions, null, ColumnOptions,
-                null));
-            builder.Services.AddTransient(_ => sinkOptions);
+            builder.Services.AddTransient(_ => new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions);
+            builder.Services.AddTransient<IStandardColumnDataGenerator, StandardColumnDataGenerator>();
+            builder.Services.AddTransient<IXmlPropertyFormatter, XmlPropertyFormatter>();
+            builder.Services.AddTransient<ISinkDependencies, SinkDependencies>();
+            builder.Services.AddTransient<SinkDependencies>();
+
+            builder.Services.AddTransient<ColumnOptions>(_ => new ColumnOptionsProvider().ColumnOptions);
 
             builder.Services.AddHostedService<LoggingService>();
             builder.Services.AddHostedService<AuditService>();
@@ -96,4 +71,85 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
             return builder;
         }
     }
+
+    public class ConnectionString
+    {
+        public string DefaultConnection { get; }
+        public string DatabaseName { get; }
+
+        public ConnectionString(string connectionString, string databaseName)
+        {
+            DatabaseName = databaseName;
+            DefaultConnection = connectionString;
+        }
+    }
+
+
+
 }
+
+public class ColumnOptionsProvider
+{
+    public ColumnOptions ColumnOptions => new()
+    {
+        AdditionalColumns =
+        [
+            new ()
+                {
+                    ColumnName = "Thread", PropertyName = "ThreadId", DataType = SqlDbType.Int, AllowNull = true
+                },
+                new ()
+                {
+                    ColumnName = "Server", PropertyName = "MachineName", DataType = SqlDbType.NVarChar,
+                    DataLength = 64,
+                    AllowNull = true
+                },
+                new()
+                {
+                    ColumnName = "Logger",
+                    PropertyName = "SourceContext",
+                    DataType = SqlDbType.NVarChar,
+                    DataLength = 64,
+                    AllowNull = true
+                },
+                new()
+                {
+                    ColumnName = "RequestUrl",
+                    PropertyName = "RequestUrl",
+                    DataType = SqlDbType.NVarChar,
+                    DataLength = 64,
+                    AllowNull = true
+                },
+                new()
+                {
+                    ColumnName = "CorrelationId",
+                    PropertyName = "CorrelationId",
+                    DataType = SqlDbType.UniqueIdentifier,
+                    AllowNull = true
+                },
+                new()
+                {
+                    ColumnName = "ExternalCorrelationId",
+                    PropertyName = "ExternalCorrelationId",
+                    DataType = SqlDbType.UniqueIdentifier,
+                    DataLength = 64,
+                    AllowNull = true
+                },
+                new()
+                {
+                    ColumnName = "PublishTimestamp",
+                    PropertyName = "PublishTimestamp",
+                    DataType = SqlDbType.DateTimeOffset,
+                    AllowNull = true
+                }
+        ],
+        TimeStamp = new ColumnOptions.TimeStampColumnOptions
+        {
+            ColumnName = "DequeueTimestamp",
+            DataType = SqlDbType.DateTimeOffset
+
+        }
+    };
+}
+
+

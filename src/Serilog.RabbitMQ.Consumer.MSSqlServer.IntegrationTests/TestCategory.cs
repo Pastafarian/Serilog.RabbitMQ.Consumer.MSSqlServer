@@ -1,4 +1,4 @@
-﻿namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
+﻿namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 {
     public static class TestCategory
     {

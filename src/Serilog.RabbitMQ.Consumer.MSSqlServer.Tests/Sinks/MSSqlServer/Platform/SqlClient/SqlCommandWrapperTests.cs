@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.Data.SqlClient;
-using Xunit;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Serilog.Sinks.MSSqlServer.Platform.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform.SqlClient;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Platform.SqlClient
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform.SqlClient
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SqlCommandWrapperTests

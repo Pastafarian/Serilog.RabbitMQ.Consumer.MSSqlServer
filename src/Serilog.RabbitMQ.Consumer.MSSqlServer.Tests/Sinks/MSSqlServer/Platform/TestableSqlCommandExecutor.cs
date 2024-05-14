@@ -1,7 +1,6 @@
-﻿using System;
-using Serilog.Debugging;
+﻿using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
 
-namespace Serilog.Sinks.MSSqlServer.Platform
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
 {
     internal class TestableSqlCommandExecutor : SqlCommandExecutor
     {

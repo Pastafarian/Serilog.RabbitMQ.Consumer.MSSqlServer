@@ -139,7 +139,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions
         /// <summary>
         /// Options for the TimeStamp column.
         /// </summary>
-        public TimeStampColumnOptions TimeStamp { get; private set; }
+        public TimeStampColumnOptions TimeStamp { get; set; }
 
         /// <summary>
         /// Options for the LogEvent column.

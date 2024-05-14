@@ -27,7 +27,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
             _sqlConnectionFactory = sqlConnectionFactory ?? throw new ArgumentNullException(nameof(sqlConnectionFactory));
             _logEventDataGenerator = logEventDataGenerator ?? throw new ArgumentNullException(nameof(logEventDataGenerator));
         }
-        private readonly object balanceLock = new object();
+        private readonly object balanceLock = new();
         public async Task WriteBatch(List<LogEventWithExceptionAsJsonString> events, DataTable dataTable)
         {
 

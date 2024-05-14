@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Moq;
-using Serilog.Events;
-using Serilog.Sinks.MSSqlServer.Output;
-using Serilog.Sinks.MSSqlServer.Platform;
-using Serilog.Sinks.MSSqlServer.Platform.SqlClient;
-using Serilog.Sinks.MSSqlServer.Tests.TestUtils;
-using Xunit;
+﻿using Moq;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform.SqlClient;
+using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
 
-namespace Serilog.Sinks.MSSqlServer.Tests.Platform
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
 {
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class SqlInsertStatementWriterTests
@@ -121,11 +117,11 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
             var field3Value = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
             var fieldsAndValues = new List<KeyValuePair<string, object>>
             {
-                new KeyValuePair<string, object>("FieldName1", field1Value),
-                new KeyValuePair<string, object>("FieldName2", field2Value),
-                new KeyValuePair<string, object>("FieldNameThree", field3Value)
+                new("FieldName1", field1Value),
+                new("FieldName2", field2Value),
+                new("FieldNameThree", field3Value)
             };
-            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEvent>()))
+            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEventWithExceptionAsJsonString>()))
                 .Returns(fieldsAndValues);
 
             // Act
@@ -145,11 +141,11 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
             var logEvent = TestLogEventHelper.CreateLogEvent();
             var fieldsAndValues = new List<KeyValuePair<string, object>>
             {
-                new KeyValuePair<string, object>("FieldName1", "FieldValue1"),
-                new KeyValuePair<string, object>("FieldName2", 2),
-                new KeyValuePair<string, object>("FieldNameThree", new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                new("FieldName1", "FieldValue1"),
+                new("FieldName2", 2),
+                new("FieldNameThree", new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero))
             };
-            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEvent>()))
+            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEventWithExceptionAsJsonString>()))
                 .Returns(fieldsAndValues);
 
             // Act
@@ -225,7 +221,7 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         public async Task WriteBatchRethrowsIfLogEventDataGeneratorGetColumnsAndValuesThrows()
         {
             // Arrange
-            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEvent>())).Callback(() => throw new InvalidOperationException());
+            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEventWithExceptionAsJsonString>())).Callback(() => throw new InvalidOperationException());
             var logEvents = CreateLogEvents();
 
             // Act + assert
@@ -237,8 +233,8 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
         {
             // Arrange
             _sqlCommandWrapperMock.Setup(c => c.AddParameter(It.IsAny<string>(), It.IsAny<object>())).Callback(() => throw new InvalidOperationException());
-            var fieldsAndValues = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("FieldName1", "FieldValue1") };
-            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEvent>()))
+            var fieldsAndValues = new List<KeyValuePair<string, object>> { new("FieldName1", "FieldValue1") };
+            _logEventDataGeneratorMock.Setup(d => d.GetColumnsAndValues(It.IsAny<LogEventWithExceptionAsJsonString>()))
                 .Returns(fieldsAndValues);
             var logEvents = CreateLogEvents();
 
@@ -257,9 +253,9 @@ namespace Serilog.Sinks.MSSqlServer.Tests.Platform
             await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.WriteBatch(logEvents));
         }
 
-        private static List<LogEvent> CreateLogEvents()
+        private static List<LogEventWithExceptionAsJsonString> CreateLogEvents()
         {
-            var logEvents = new List<LogEvent>
+            var logEvents = new List<LogEventWithExceptionAsJsonString>
             {
                 TestLogEventHelper.CreateLogEvent(),
                 TestLogEventHelper.CreateLogEvent()
