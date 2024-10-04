@@ -18,7 +18,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
         private readonly Mock<IRabbitConnectionFactory> _connectionFactory = new();
         private readonly Mock<ILogger<LoggingService>> _logger = new();
         private readonly MSSqlServerSinkOptions _sinkOptions = new();
-        private readonly Mock<SinkDependencies> _sinkDependencies = new();
+        private readonly Mock<ISinkDependencies> _sinkDependencies = new();
         private readonly Mock<IAsyncEventingBasicConsumerFactory> _asyncEventingBasicConsumerFactory = new();
         private readonly RabbitMqClientConsumerConfiguration _rabbitMqConfiguration = new();
         private readonly Mock<IModel> _mockChannel;
@@ -52,9 +52,8 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
         [Fact]
         public async Task ProcessMessage_WhenLogEventIsNull_ThrowsArgumentNullException()
         {
-            // Arrange
-            // Act
-            var act = () => _sut!.ProcessMessage(null!, new BasicDeliverEventArgs());
+            // Arrange + Act
+            var act = () => _sut.ProcessMessage(null!, new BasicDeliverEventArgs());
 
             // Assert
             await act.Should().ThrowAsync<ArgumentNullException>();
@@ -74,7 +73,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
             await _sut.ProcessMessage(log, basicDeliverEventArgs);
 
             // Assert
-            _sinkDependencies.Verify(x => x.SqlLogEventWriter!.WriteEvent(log), Times.Once);
+            _sinkDependencies.Verify(x => x.SqlLogEventWriter.WriteEvent(log), Times.Once);
             _mockChannel.Verify(x => x.BasicAck(basicDeliverEventArgs.DeliveryTag, true), Times.Once);
         }
 
@@ -97,7 +96,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
             // Assert
             if (eventSent)
             {
-                _sinkDependencies.Verify(x => x.SqlBulkBatchWriter!.WriteBatch(It.IsAny<List<LogEventWithExceptionAsJsonString>>(), It.IsAny<DataTable>()), Times.Once);
+                _sinkDependencies.Verify(x => x.SqlBulkBatchWriter.WriteBatch(It.IsAny<List<LogEventWithExceptionAsJsonString>>(), It.IsAny<DataTable>()), Times.Once);
                 _mockChannel.Verify(x => x.BasicAck(basicDeliverEventArgs.DeliveryTag, true), Times.Once);
             }
             else
@@ -139,7 +138,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
             // Assert
             if (eventSent)
             {
-                _sinkDependencies.Verify(x => x.SqlBulkBatchWriter!.WriteBatch(It.IsAny<List<LogEventWithExceptionAsJsonString>>(), It.IsAny<DataTable>()), Times.Once);
+                _sinkDependencies.Verify(x => x.SqlBulkBatchWriter.WriteBatch(It.IsAny<List<LogEventWithExceptionAsJsonString>>(), It.IsAny<DataTable>()), Times.Once);
                 _mockChannel.Verify(x => x.BasicAck(basicDeliverEventArgs.DeliveryTag, true), Times.Once);
             }
             else

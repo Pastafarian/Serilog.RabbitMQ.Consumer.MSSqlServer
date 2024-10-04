@@ -11,17 +11,17 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
     [Trait(TestCategory.TraitName, TestCategory.Unit)]
     public class JsonLogEventFormatterTests
     {
-        private readonly Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _testColumnOptions;
+        private readonly Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _testColumnOptions;
         private readonly IStandardColumnDataGenerator _testStandardColumnDataGenerator;
         private readonly JsonLogEventFormatter _sut;
 
         public JsonLogEventFormatterTests()
         {
-            _testColumnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            _testColumnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
             _testColumnOptions.Store.Add(StandardColumn.LogEvent);
 
             // TODO use mock for _testColumnsDataGenerator
-            _testStandardColumnDataGenerator = new StandardColumnDataGenerator(_testColumnOptions, new XmlPropertyFormatter());
+            _testStandardColumnDataGenerator = new StandardColumnDataGenerator(_testColumnOptions, null, new XmlPropertyFormatter());
 
             _sut = new JsonLogEventFormatter(_testColumnOptions, _testStandardColumnDataGenerator);
         }

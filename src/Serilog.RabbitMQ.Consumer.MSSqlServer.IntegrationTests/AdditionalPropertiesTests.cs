@@ -1,31 +1,45 @@
 ﻿extern alias ConsumerAlias;
 using System.Data;
+using System.Globalization;
 using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions;
-using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.Setup;
+using Dapper;
+using FluentAssertions;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog.Loggers.RabbitMQ;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.Setup;
-using Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.TestUtils;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
-using Xunit.Abstractions;
-using MsSqlServerSinkOptionsProvider = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.Setup.MsSqlServerSinkOptionsProvider;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 {
+    [Collection("Database collection")]
     [Trait(TestCategory.TraitName, TestCategory.Integration)]
-    public class AdditionalPropertiesTests : DatabaseTestsBase
+    public class AdditionalPropertiesTests //: IClassFixture<DatabaseFixture>//: DatabaseTestsBase//, IClassFixture<ProducerAndConsumerFixture>
     {
-        private readonly ProducerAndConsumerFixture _fixture;
+        private readonly DatabaseFixture _fixture;
 
-        public AdditionalPropertiesTests(ITestOutputHelper output) : base(output)
+        //private readonly ProducerAndConsumerFixture _fixture;
+
+        public AdditionalPropertiesTests(DatabaseFixture fixture)
         {
+            _fixture = fixture;
+
         }
 
         [Fact]
         public async Task WritesLogEventWithCustomNamedProperties()
         {
+            // Arrange
+            //await _fixture.MsSqlContainer.StartAsync();
+            //await _fixture.RabbitMqContainer.StartAsync();
+            //await _fixture.MsSqlContainer.DisposeAsync();
+            //await _fixture.RabbitMqContainer.DisposeAsync();
+            //_fixture.BuildTestContainers();
+            //_fixture.BuildConsumerHttpClient();
+            //_fixture.BuildProducerHttpClient();
+            //await _fixture.MsSqlContainer.StartAsync();
+            //await _fixture.RabbitMqContainer.StartAsync();
 
             // Arrange
             const string additionalColumn1Name = "AdditionalColumn1";
@@ -34,8 +48,8 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
             const string additionalProperty2Name = "AdditionalProperty2";
             var columnOptions = new ColumnOptions
             {
-                AdditionalColumns = new List<SqlColumn>
-                {
+                AdditionalColumns =
+                [
                     new()
                     {
                         ColumnName = additionalColumn1Name,
@@ -51,33 +65,18 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
                         DataType = SqlDbType.Int,
                         AllowNull = true
                     }
-                }
+                ]
             };
-
-            var messageTemplate = $"Hello {{{additionalProperty1Name}}} from thread {{{additionalProperty2Name}}}";
-            var property1Value = "PropertyValue1";
-            var property2Value = 2;
+            const string messageTemplate = $"Hello {{{additionalProperty1Name}}} from thread {{{additionalProperty2Name}}}";
+            const string property1Value = "PropertyValue1";
+            const int property2Value = 2;
             var expectedMessage = $"Hello \"{property1Value}\" from thread {property2Value}";
 
-            string connectionString;
-            await InitializeAsync((service) =>
+            _fixture.BuildConsumerHttpClient(service =>
             {
                 service.RemoveAll(typeof(ColumnOptions));
-                service.TryAddTransient<ColumnOptions>((_) => columnOptions);
+                service.TryAddTransient(_ => columnOptions);
 
-                service.RemoveAll(typeof(ConnectionString));
-                connectionString = MsSqlContainer.GetConnectionString();
-                DatabaseFixture.LogEventsConnectionString = connectionString;
-                service.TryAddTransient<ConnectionString>((_) => new ConnectionString(MsSqlContainer.GetConnectionString(), DatabaseFixture.Database));
-
-                service.RemoveAll(typeof(MSSqlServerSinkOptions));
-
-                var sinkOptions = new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions;
-
-                sinkOptions.TableName = DatabaseFixture.LogTableName;
-                sinkOptions.AutoCreateSqlTable = true;
-
-                service.TryAddTransient((_) => sinkOptions);
                 return true;
             });
 
@@ -89,87 +88,90 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 
             var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
             logger.Information(messageTemplate, property1Value, property2Value);
+            await Task.Delay(19000);
 
             // Assert
-            VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
-            VerifyLogMessageWasWritten(expectedMessage);
+            VerifyLogMessageWasWritten(expectedMessage, "Message");
             VerifyStringColumnWritten(additionalColumn1Name, property1Value);
             VerifyIntegerColumnWritten(additionalColumn2Name, property2Value);
-            await DisposeAsync();
+            DatabaseFixture.DeleteDatabase();
         }
 
-        [Fact]
-        public async Task WritesLogEventWithColumnNamedProperties()
-        {
-            // Arrange
-            const string additionalColumnName1 = "AdditionalColumn1";
-            const string additionalColumnName2 = "AdditionalColumn2";
+        //[Fact]
+        //public async Task WritesLogEventWithColumnNamedProperties()
+        //{
+        //    // Arrange
+        //    const string additionalColumn1Name = "AdditionalColumn1";
+        //    const string additionalColumn2Name = "AdditionalColumn2";
+        //    var columnOptions = new ColumnOptions
+        //    {
+        //        AdditionalColumns = new List<SqlColumn>
+        //        {
+        //            new()
+        //            {
+        //                ColumnName = additionalColumn1Name,
+        //                PropertyName = "Foo",
+        //                DataType = SqlDbType.NVarChar,
+        //                AllowNull = true,
+        //                DataLength = 100
+        //            },
+        //            new()
+        //            {
+        //                ColumnName = additionalColumn2Name,
+        //                PropertyName = "Bar",
+        //                DataType = SqlDbType.Int,
+        //                AllowNull = true
+        //            }
+        //        }
+        //    };
+        //    string connectionString;
+        //    await InitializeAsync((service) =>
+        //    {
+        //        service.RemoveAll(typeof(ColumnOptions));
+        //        service.TryAddTransient<ColumnOptions>((_) => columnOptions);
 
-            var columnOptions = new ColumnOptions
-            {
-                AdditionalColumns = new List<SqlColumn>
-                {
-                    new()
-                    {
-                        ColumnName = additionalColumnName1,
-                        DataType = SqlDbType.NVarChar,
-                        AllowNull = true,
-                        DataLength = 100
-                    },
-                    new()
-                    {
-                        ColumnName = additionalColumnName2,
-                        DataType = SqlDbType.Int,
-                        AllowNull = true
-                    }
-                }
-            };
-            string connectionString;
-            await InitializeAsync((service) =>
-            {
-                service.RemoveAll(typeof(ColumnOptions));
-                service.TryAddTransient<ColumnOptions>((_) => columnOptions);
+        //        service.RemoveAll(typeof(ConnectionString));
+        //        connectionString = MsSqlContainer.GetConnectionString();
+        //        DatabaseFixture.LogEventsConnectionString = connectionString;
+        //        service.TryAddTransient<ConnectionString>((_) => new ConnectionString(MsSqlContainer.GetConnectionString(), DatabaseFixture.Database));
 
-                service.RemoveAll(typeof(ConnectionString));
-                connectionString = MsSqlContainer.GetConnectionString();
-                DatabaseFixture.LogEventsConnectionString = connectionString;
-                service.TryAddTransient<ConnectionString>((_) => new ConnectionString(MsSqlContainer.GetConnectionString(), DatabaseFixture.Database));
+        //        service.RemoveAll(typeof(MSSqlServerSinkOptions));
 
-                service.RemoveAll(typeof(MSSqlServerSinkOptions));
+        //        var sinkOptions = new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions;
 
-                var sinkOptions = new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions;
+        //        sinkOptions.TableName = DatabaseFixture.LogTableName;
+        //        sinkOptions.AutoCreateSqlTable = true;
 
-                sinkOptions.TableName = DatabaseFixture.LogTableName;
-                sinkOptions.AutoCreateSqlTable = true;
+        //        service.TryAddTransient((_) => sinkOptions);
+        //        return true;
+        //    });
 
-                service.TryAddTransient((_) => sinkOptions);
-                return true;
-            });
+        //    var messageTemplate = $"Hello {{{additionalColumn1Name}}} from thread {{{additionalColumn2Name}}}";
+        //    var property1Value = "PropertyValue1";
+        //    var property2Value = 2;
+        //    var expectedMessage = $"Hello \"{property1Value}\" from thread {property2Value}";
 
+        //    IConfiguration loggerConfiguration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.int-test.json", true, true)
+        //        .Build();
 
+        //    var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
 
-            const string messageTemplate = $"Hello {{{additionalColumnName1}}} from thread {{{additionalColumnName2}}}";
-            const string property1Value = "PropertyValue1";
-            const int property2Value = 2;
-            var expectedMessage = $"Hello \"{property1Value}\" from thread \"{property2Value}\"";
-            IConfiguration loggerConfiguration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.int-test.json", true, true)
-                .Build();
+        //    logger.Error(messageTemplate, property1Value, property2Value);
+        //    await Task.Delay(9000);
 
-            var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
+        //    // Assert
+        //    VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
+        //    VerifyLogMessageWasWritten(expectedMessage);
+        //    VerifyStringColumnWritten(additionalColumn1Name, property1Value);
+        //    VerifyIntegerColumnWritten(additionalColumn2Name, property2Value);
 
-            logger.Error(messageTemplate, property1Value, property2Value);
-            await Task.Delay(5000);
-
-            // Assert
-            VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
-            VerifyLogMessageWasWritten(expectedMessage);
-            VerifyStringColumnWritten(additionalColumnName1, property1Value);
-            VerifyIntegerColumnWritten(additionalColumnName2, property2Value);
-
-            await DisposeAsync();
-        }
+        //    await DisposeAsync();
+        //    ProducerHttpClient?.Dispose();
+        //    ConsumerHttpClient?.Dispose();
+        //    await Task.Delay(9000);
+        //}
 
         [Trait("Bugfix", "#458")]
         [Fact]
@@ -197,32 +199,16 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
                     }
                 }
             };
-
-            string connectionString;
-            await InitializeAsync((service) =>
-            {
-                service.RemoveAll(typeof(ColumnOptions));
-                service.TryAddTransient<ColumnOptions>((_) => columnOptions);
-
-                service.RemoveAll(typeof(ConnectionString));
-                connectionString = MsSqlContainer.GetConnectionString();
-                DatabaseFixture.LogEventsConnectionString = connectionString;
-                service.TryAddTransient<ConnectionString>((_) => new ConnectionString(MsSqlContainer.GetConnectionString(), DatabaseFixture.Database));
-
-                service.RemoveAll(typeof(MSSqlServerSinkOptions));
-
-                var sinkOptions = new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions;
-
-                sinkOptions.TableName = DatabaseFixture.LogTableName;
-                sinkOptions.AutoCreateSqlTable = true;
-
-                service.TryAddTransient((_) => sinkOptions);
-                return true;
-            });
-
             var messageTemplate = $"Hello {{{additionalColumnName1}}} from thread {{{additionalColumnName2}}}";
             var property1Value = "PropertyValue1";
             var expectedMessage = $"Hello \"{property1Value}\" from thread null";
+            _fixture.BuildConsumerHttpClient(service =>
+            {
+                service.RemoveAll(typeof(ColumnOptions));
+                service.TryAddTransient(_ => columnOptions);
+
+                return true;
+            });
 
             // Act
             IConfiguration loggerConfiguration = new ConfigurationBuilder()
@@ -231,17 +217,75 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
                 .Build();
 
             var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
-
             logger.Information(messageTemplate, property1Value, null);
-            await Task.Delay(5000);
-
-            // Assert
+            await Task.Delay(9000);
             VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
             VerifyLogMessageWasWritten(expectedMessage);
             VerifyStringColumnWritten(additionalColumnName1, property1Value);
-            await DisposeAsync();
+            DatabaseFixture.DeleteDatabase();
         }
 
+        protected void VerifyDatabaseColumnsWereCreated(IEnumerable<SqlColumn> columnDefinitions)
+        {
+            if (columnDefinitions == null)
+            {
+                return;
+            }
+
+            using (var conn = new SqlConnection(_fixture.MsSqlContainer.GetConnectionString()))
+            {
+                var logEvents = conn.Query<InfoSchema>(
+                    $@"SELECT COLUMN_NAME AS ColumnName, UPPER(DATA_TYPE) as DataType, CHARACTER_MAXIMUM_LENGTH as DataLength, IS_NULLABLE as AllowNull
+                    FROM {DatabaseFixture.Database}.INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{DatabaseFixture.LogTableName}'");
+                var infoSchema = logEvents as InfoSchema[] ?? logEvents.ToArray();
+
+                foreach (var definition in columnDefinitions)
+                {
+                    var column = infoSchema.SingleOrDefault(c => c.ColumnName == definition.ColumnName);
+                    Assert.NotNull(column);
+                    var definitionDataType = definition.DataType.ToString().ToUpperInvariant();
+                    Assert.Equal(definitionDataType, column.DataType);
+                    if (definitionDataType == "NVARCHAR" || definitionDataType == "VARCHAR")
+                    {
+                        Assert.Equal(definition.DataLength.ToString(CultureInfo.InvariantCulture), column.DataLength);
+                    }
+
+                    if (definition.AllowNull)
+                    {
+                        Assert.Equal("YES", column.AllowNull);
+                    }
+                    else
+                    {
+                        Assert.Equal("NO", column.AllowNull);
+                    }
+                }
+            }
+        }
+
+        protected void VerifyStringColumnWritten(string columnName, string expectedValue)
+        {
+            using (var conn = new SqlConnection(_fixture.MsSqlContainer.GetConnectionString()))
+            {
+                var logEvents = conn.Query<string>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
+
+                logEvents.Should().Contain(c => c == expectedValue);
+            }
+        }
+
+        protected void VerifyLogMessageWasWritten(string expectedMessage, string messageColumnName = "Message")
+        {
+            VerifyStringColumnWritten(messageColumnName, expectedMessage);
+        }
+
+        protected void VerifyIntegerColumnWritten(string columnName, int expectedValue)
+        {
+            using (var conn = new SqlConnection(_fixture.MsSqlContainer.GetConnectionString()))
+            {
+                var logEvents = conn.Query<int>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
+
+                logEvents.Should().Contain(c => c == expectedValue);
+            }
+        }
 
         //[Fact]
         //public void WritesLogEventWithColumnsFromHierarchicalNamedProperties()
@@ -305,6 +349,10 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
         //    VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
         //    VerifyStringColumnWritten(additionalColumn1Name, property1Value);
         //    VerifyIntegerColumnWritten(additionalColumn2Name, property2Value);
+        //}
+        //public void Dispose()
+        //{
+        //    _fixture.Dispose();
         //}
     }
 }

@@ -30,7 +30,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key1"), new ScalarValue("Value1")),
                 new(new ScalarValue("Key2"), new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -49,7 +49,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key1"), new ScalarValue("Value1")),
                 new(new ScalarValue("Key2"), new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -67,7 +67,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
             {
                 new(new ScalarValue("Key1"), new ScalarValue("some<allowed>words&inbetween"))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -85,7 +85,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
             {
                 new(new ScalarValue("some<allowed>words&inbetween"), new ScalarValue("Value1"))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -105,7 +105,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key2"), new ScalarValue("Value2")),
                 new(new ScalarValue("Key3"), new ScalarValue(null))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -124,7 +124,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key1"), new ScalarValue("Value1")),
                 new(new ScalarValue("Key2"), new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { ItemElementName = "customitem" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { ItemElementName = "customitem" };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -143,7 +143,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key1"), new ScalarValue("Value1")),
                 new(new ScalarValue("Key2"), new ScalarValue("Value2"))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitDictionaryContainerElement = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitDictionaryContainerElement = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -162,7 +162,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new(new ScalarValue("Key1"), new ScalarValue("Value1")),
                 new(new ScalarValue("Key2"), new ScalarValue("Value2"))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { DictionaryElementName = "list" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { DictionaryElementName = "list" };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -181,7 +181,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new ScalarValue("Value1"),
                 new ScalarValue(2)
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -199,7 +199,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
             {
                 new ScalarValue("some<allowed>words&inbetween")
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -219,7 +219,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new ScalarValue("Value2"),
                 new ScalarValue(null)
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -238,7 +238,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new ScalarValue("Value1"),
                 new ScalarValue("Value2")
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitSequenceContainerElement = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitSequenceContainerElement = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -257,7 +257,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new ScalarValue("Value1"),
                 new ScalarValue("Value2")
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { SequenceElementName = "list" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { SequenceElementName = "list" };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -276,7 +276,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new ScalarValue("Value1"),
                 new ScalarValue("Value2")
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { ItemElementName = "element" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { ItemElementName = "element" };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -295,7 +295,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key1", new ScalarValue("Value1")),
                 new("Key2", new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions();
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -314,7 +314,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key1", new ScalarValue("Value1")),
                 new("Key2", new ScalarValue(2))
             }, "structuretype");
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -332,7 +332,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
             {
                 new("xml Key With Space", new ScalarValue("Value1"))
             }, "5structure\ttype");
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { UsePropertyKeyAsElementName = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -352,7 +352,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key2", new ScalarValue("Value2")),
                 new("Key3", new ScalarValue(null))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitElementIfEmpty = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -371,7 +371,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key1", new ScalarValue("Value1")),
                 new("Key2", new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { PropertyElementName = "propertyitem" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { PropertyElementName = "propertyitem" };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -390,7 +390,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key1", new ScalarValue("Value1")),
                 new("Key2", new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitStructureContainerElement = true };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { OmitStructureContainerElement = true };
             var sut = new XmlPropertyFormatter();
 
             // Act
@@ -409,7 +409,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Output
                 new("Key1", new ScalarValue("Value1")),
                 new("Key2", new ScalarValue(2))
             });
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { StructureElementName = "propertylist" };
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions.PropertiesColumnOptions { StructureElementName = "propertylist" };
             var sut = new XmlPropertyFormatter();
 
             // Act

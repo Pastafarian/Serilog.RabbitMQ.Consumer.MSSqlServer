@@ -8,7 +8,7 @@ using Serilog.RabbitMQ.Consumer.MSSqlServer.RabbitMQ;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
 {
-    public interface IColumnOptionsProvider
+    interface IColumnOptionsProvider
     {
         ColumnOptions ColumnOptions { get; }
     }
@@ -55,15 +55,15 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
 
 
             builder.Services.AddTransient<IRabbitConnectionFactory, RabbitConnectionFactory>();
-            builder.Services.AddTransient((s) => s.GetService<IRabbitConnectionFactory>()!.GetConnectionFactory());
+            builder.Services.AddTransient(s => s.GetService<IRabbitConnectionFactory>()!.GetConnectionFactory());
             builder.Services.AddTransient<IAsyncEventingBasicConsumerFactory, AsyncEventingBasicConsumerFactory>();
             builder.Services.AddTransient(_ => new MsSqlServerSinkOptionsProvider().MsSqlServerSinkOptions);
             builder.Services.AddTransient<IStandardColumnDataGenerator, StandardColumnDataGenerator>();
             builder.Services.AddTransient<IXmlPropertyFormatter, XmlPropertyFormatter>();
             builder.Services.AddTransient<ISinkDependencies, SinkDependencies>();
-            builder.Services.AddTransient<SinkDependencies>();
+            //builder.Services.AddTransient<SinkDependencies>();
 
-            builder.Services.AddTransient<ColumnOptions>(_ => new ColumnOptionsProvider().ColumnOptions);
+            builder.Services.AddTransient(_ => new ColumnOptionsProvider().ColumnOptions);
 
             builder.Services.AddHostedService<LoggingService>();
             builder.Services.AddHostedService<AuditService>();

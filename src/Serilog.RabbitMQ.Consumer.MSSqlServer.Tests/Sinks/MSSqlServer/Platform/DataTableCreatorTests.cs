@@ -9,12 +9,12 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
     public class DataTableCreatorTests
     {
         private const string _tableName = "TestTableName";
-        private readonly Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _columnOptions;
+        private readonly Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions _columnOptions;
         private DataTableCreator _sut;
 
         public DataTableCreatorTests()
         {
-            _columnOptions = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            _columnOptions = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
         }
 
         [Fact]

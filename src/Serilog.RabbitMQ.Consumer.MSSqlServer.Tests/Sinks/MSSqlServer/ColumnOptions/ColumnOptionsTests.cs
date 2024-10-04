@@ -10,7 +10,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void GetStandardColumnOptionsReturnsTraceIdOptions()
         {
             // Arrange
-            var sut = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var sut = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act
             var result = sut.GetStandardColumnOptions(StandardColumn.TraceId);
@@ -23,7 +23,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void GetStandardColumnOptionsReturnsSpanIdOptions()
         {
             // Arrange
-            var sut = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var sut = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act
             var result = sut.GetStandardColumnOptions(StandardColumn.SpanId);

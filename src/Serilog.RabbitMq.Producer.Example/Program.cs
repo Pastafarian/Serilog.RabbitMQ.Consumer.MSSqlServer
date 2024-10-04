@@ -11,6 +11,7 @@ builder.Services.AddHttpContextAccessor();
 IConfiguration loggerConfiguration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.log.json", true, true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.log.json", true, true)
     .Build();
 
 var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
@@ -20,6 +21,7 @@ Log.Logger = logger;
 IConfiguration auditConfiguration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.audit.json", true, true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.log.json", true, true)
     .Build();
 
 var auditLogger = LoggerBuilder.BuildAuditLogger(auditConfiguration);

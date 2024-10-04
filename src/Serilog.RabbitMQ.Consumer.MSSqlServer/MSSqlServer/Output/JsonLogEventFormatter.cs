@@ -15,13 +15,14 @@
 using System.Data;
 using System.Globalization;
 using Serilog.Events;
+using Serilog.Formatting;
 using Serilog.Formatting.Json;
 using Serilog.Parsing;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    public interface ITextFormatterLogEventWithExceptionAsJsonString
+    public interface ITextFormatterLogEventWithExceptionAsJsonString : ITextFormatter
     {
         /// <summary>
         /// Format the log event into the output.
@@ -52,7 +53,10 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
             _standardColumnsDataGenerator = standardColumnsDataGenerator ?? throw new ArgumentNullException(nameof(standardColumnsDataGenerator));
             _valueFormatter = new JsonValueFormatter(typeTagName: null);
         }
-
+        public void Format(LogEvent logEvent, TextWriter output)
+        {
+            throw new NotImplementedException();
+        }
         /// <summary>
         /// Format the log event into the output while respecting the LogEvent column settings.
         /// </summary>

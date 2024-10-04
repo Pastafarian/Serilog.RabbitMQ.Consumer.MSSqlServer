@@ -7,6 +7,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies
 {
     public interface ISinkDependencies
     {
+        ColumnOptions.ColumnOptions ColumnOptions { get; }
         IDataTableCreator DataTableCreator { get; set; }
         ISqlCommandExecutor SqlDatabaseCreator { get; set; }
         ISqlCommandExecutor SqlTableCreator { get; set; }
@@ -16,12 +17,15 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies
 
     public class SinkDependencies : ISinkDependencies
     {
+        public ColumnOptions.ColumnOptions ColumnOptions { get; }
+
         public SinkDependencies(ConnectionString connectionString,
             MSSqlServerSinkOptions sinkOptions,
+            IFormatProvider? formatProvider,
             ColumnOptions.ColumnOptions columnOptions)
         {
             columnOptions.FinalizeConfigurationForSinkConstructor();
-
+            ColumnOptions = columnOptions;
             var sqlConnectionStringBuilderWrapper = new SqlConnectionStringBuilderWrapper(
                 connectionString.DefaultConnection, sinkOptions.EnlistInTransaction)
             { InitialCatalog = connectionString.DatabaseName };
@@ -41,7 +45,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Dependencies
 
             var logEventDataGenerator =
                 new LogEventDataGenerator(columnOptions,
-                    new StandardColumnDataGenerator(columnOptions,
+                    new StandardColumnDataGenerator(columnOptions, formatProvider,
                         new XmlPropertyFormatter()),
                     new AdditionalColumnDataGenerator(
                         new ColumnSimplePropertyValueResolver(),

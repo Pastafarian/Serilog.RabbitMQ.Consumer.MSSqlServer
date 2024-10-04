@@ -38,6 +38,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions
             };
 
             PrimaryKey = Id; // for backwards-compatibility, ignored if Id removed from Store
+            AdditionalColumns = new List<SqlColumn>();
         }
 
         /// <summary>

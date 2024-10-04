@@ -18,15 +18,16 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 
         public StandardColumnDataGenerator(
             ColumnOptions.ColumnOptions columnOptions,
-            IXmlPropertyFormatter xmlPropertyFormatter)
+            IFormatProvider? formatProvider,
+            IXmlPropertyFormatter xmlPropertyFormatter,
+            ITextFormatterLogEventWithExceptionAsJsonString? logEventFormatter = null)
         {
             _columnOptions = columnOptions ?? throw new ArgumentNullException(nameof(columnOptions));
-
-
+            _formatProvider = formatProvider;
             _xmlPropertyFormatter = xmlPropertyFormatter ?? throw new ArgumentNullException(nameof(xmlPropertyFormatter));
 
             if (_columnOptions.Store.Contains(StandardColumn.LogEvent))
-                _logEventFormatter = new JsonLogEventFormatter(columnOptions, this);
+                _logEventFormatter = logEventFormatter ?? new JsonLogEventFormatter(columnOptions, this);
 
             _additionalColumnPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (_columnOptions.AdditionalColumns != null)

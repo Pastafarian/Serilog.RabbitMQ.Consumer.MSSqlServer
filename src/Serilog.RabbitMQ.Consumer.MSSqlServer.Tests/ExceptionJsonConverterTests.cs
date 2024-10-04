@@ -26,7 +26,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests
             // Assert
             exception.Should().NotBeNull();
             exception!.Message.Should().Be("Test exception audit logging - unique-message-01c7914b-ecc8-4413-a73d-8041aae2f234");
-            exception!.StackTrace.Should().Be("   at Serilog.Producer.RabbitMq.Example.Pages.AuditExceptionModel.OnGet(String message) in C:\\Git\\serilog-consumer-mssqlserver\\src\\Serilog.RabbitMq.Producer.Example\\Pages\\AuditException.cshtml.cs:line 19");
+            exception.StackTrace.Should().Be("   at Serilog.Producer.RabbitMq.Example.Pages.AuditExceptionModel.OnGet(String message) in C:\\Git\\serilog-consumer-mssqlserver\\src\\Serilog.RabbitMq.Producer.Example\\Pages\\AuditException.cshtml.cs:line 19");
         }
 
         public class Samples

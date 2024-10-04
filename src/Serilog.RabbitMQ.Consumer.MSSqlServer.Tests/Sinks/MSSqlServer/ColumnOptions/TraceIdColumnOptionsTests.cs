@@ -10,7 +10,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CanSetDataTypeNVarChar()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act - should not throw
             options.TraceId.DataType = SqlDbType.NVarChar;
@@ -20,7 +20,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CanSetDataTypeVarChar()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act - should not throw
             options.TraceId.DataType = SqlDbType.VarChar;
@@ -30,7 +30,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CannotSetDataTypeBigInt()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act and assert - should throw
             Assert.Throws<ArgumentException>(() => options.TraceId.DataType = SqlDbType.BigInt);
@@ -40,7 +40,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CannotSetDataTypeNChar()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act and assert - should throw
             Assert.Throws<ArgumentException>(() => options.TraceId.DataType = SqlDbType.NChar);

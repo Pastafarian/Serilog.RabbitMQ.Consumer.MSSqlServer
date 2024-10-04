@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Serilog.Events;
 using Serilog.Parsing;
@@ -10,7 +11,7 @@ public class LogEventWithExceptionAsJsonString : LogEvent
 {
     public LogEventWithExceptionAsJsonString(LogEvent logEvent, string? exception) : base(logEvent.Timestamp,
         logEvent.Level, logEvent.Exception, logEvent.MessageTemplate,
-        new List<LogEventProperty>(logEvent.Properties.Select(x => new LogEventProperty(x.Key, x.Value))))
+        new List<LogEventProperty>(logEvent.Properties.Select(x => new LogEventProperty(x.Key, x.Value))),logEvent.TraceId ?? new ActivityTraceId(), logEvent.SpanId ?? new ActivitySpanId())
     {
         JsonException = exception;
     }
@@ -23,12 +24,6 @@ public class LogEventJsonConverter : JsonConverter<LogEventWithExceptionAsJsonSt
 {
     public override LogEventWithExceptionAsJsonString Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
     {
-        //using (var jsonDocument = JsonDocument.ParseValue(ref reader))
-        //{
-        //    var jsonText = jsonDocument.RootElement.GetRawText();
-        //    var trtrtb = jsonText;
-        //}
-
         Exception? exception = null;
         var level = LogEventLevel.Information;
         _ = JsonDocument.TryParseValue(ref reader, out var document);
@@ -76,6 +71,11 @@ public class LogEventJsonConverter : JsonConverter<LogEventWithExceptionAsJsonSt
                 if (property.Value.ValueKind == JsonValueKind.Null)
                 {
                     logEventPropertyValues.Add(name, new ScalarValue(null));
+                }
+                else if (property.Value.ValueKind == JsonValueKind.Number)
+                {
+                    var value = int.Parse(property.Value.ToString());
+                    logEventPropertyValues.Add(name, new ScalarValue(value));
                 }
                 else
                 {

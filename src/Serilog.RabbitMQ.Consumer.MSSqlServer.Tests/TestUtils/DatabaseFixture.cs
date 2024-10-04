@@ -8,7 +8,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils
     public sealed class DatabaseFixture : IDisposable
     {
 
-        private const string _masterConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Master;Integrated Security=True;Connect Timeout=120";
+        private const string _loggingConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=logging;Integrated Security=True;Connect Timeout=120";
         private const string _createLogEventsDatabase = @"
 EXEC ('CREATE DATABASE [{0}] ON PRIMARY 
 	(NAME = [{0}], 
@@ -50,7 +50,7 @@ DROP DATABASE [{Database}]
 
         private static void DeleteDatabase()
         {
-            using (var conn = new SqlConnection(_masterConnectionString))
+            using (var conn = new SqlConnection(_loggingConnectionString))
             {
                 conn.Open();
                 var databases = conn.Query("select name from sys.databases");
@@ -63,11 +63,11 @@ DROP DATABASE [{Database}]
         {
             DeleteDatabase();
 
-            using (var conn = new SqlConnection(_masterConnectionString))
+            using (var conn = new SqlConnection(_loggingConnectionString))
             {
                 conn.Open();
                 // ReSharper disable once PossibleNullReferenceException
-                var filename = conn.Query<FileName>(_databaseFileNameQuery).FirstOrDefault().Name;
+                var filename = conn.Query<FileName>(_databaseFileNameQuery).FirstOrDefault()!.Name;
                 var createDatabase = string.Format(CultureInfo.InvariantCulture, _createLogEventsDatabase, Database, filename);
 
                 conn.Execute(createDatabase);

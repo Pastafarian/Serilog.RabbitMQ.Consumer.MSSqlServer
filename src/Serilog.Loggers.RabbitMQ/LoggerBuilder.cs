@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Serilog.Configuration;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using Serilog.Filters;
@@ -7,6 +8,12 @@ namespace Serilog.Loggers.RabbitMQ;
 
 public static class LoggerBuilder
 {
+    public static LoggerConfiguration WithPublishTimestampEnricher(
+        this LoggerEnrichmentConfiguration enrichmentConfiguration)
+    {
+        return enrichmentConfiguration != null ? enrichmentConfiguration.With<PublishTimestampEnricher>() : throw new ArgumentNullException(nameof(enrichmentConfiguration));
+    }
+
     public static ILogger BuildLogger(IConfiguration configuration)
     {
         return new LoggerConfiguration()
@@ -16,7 +23,7 @@ public static class LoggerBuilder
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithCorrelationId()
-            .Enrich.With<PublishTimestampEnricher>()
+            .Enrich.WithPublishTimestampEnricher()
             .Filter.ByExcluding(logEvent => Matching.FromSource("Microsoft").Invoke(logEvent))
 
             .CreateLogger();
@@ -31,7 +38,7 @@ public static class LoggerBuilder
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithCorrelationId()
-            .Enrich.With<PublishTimestampEnricher>()
+            .Enrich.WithPublishTimestampEnricher()
             .Filter.ByExcluding(logEvent => Matching.FromSource("Microsoft").Invoke(logEvent))
 
             .CreateLogger();

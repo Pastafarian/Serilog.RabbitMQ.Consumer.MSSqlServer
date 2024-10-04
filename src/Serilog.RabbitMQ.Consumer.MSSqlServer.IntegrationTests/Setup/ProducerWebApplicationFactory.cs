@@ -39,7 +39,7 @@ public class ProducerWebApplicationFactory : WebApplicationFactory<Program>
         {
             using var loggerFactory = new LoggerFactory();
             loggerFactory.AddXUnit(Output, c => c.MessageSinkMessageFactory = m => new PrintableDiagnosticMessage(m))
-                .CreateLogger<EndToEndTests>();
+                .CreateLogger<ProducerWebApplicationFactory>();
             logging.AddXUnit(Output);
             logging.AddSerilog();
             logging.ClearProviders(); // Remove other loggers
@@ -49,15 +49,18 @@ public class ProducerWebApplicationFactory : WebApplicationFactory<Program>
                 .CreateLogger()
                 .ForContext<ProducerWebApplicationFactory>();
         });
-
-        builder.UseEnvironment("producer");
+        //Environment.SetEnvironmentVariable("INT_TEST_RabbitMqUserName", "guest");
+        //Environment.SetEnvironmentVariable("INT_TEST_RabbitMqPassword", "guest");
+        //Environment.SetEnvironmentVariable("INT_TEST_RabbitMqPort", "5672");
+        builder.UseEnvironment("inttest");
     }
     protected override IHost CreateHost(IHostBuilder builder)
     {
         builder.ConfigureHostConfiguration(config =>
         {
+
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.producer.json")
+                .AddJsonFile("appsettings.int-test.json")
                 .Build();
 
             config.AddConfiguration(configuration);

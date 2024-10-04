@@ -22,7 +22,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
     {
         private readonly IFakeMessageProcessor _fakeMessageProcessor;
 
-        public FakeWorkerService(ILogger<FakeWorkerService> logger, IRabbitConnectionFactory connectionFactory, MSSqlServerSinkOptions sinkOptions, SinkDependencies sinkDependencies, string queueName, RabbitMqClientConsumerConfiguration rabbitMqConfiguration, IAsyncEventingBasicConsumerFactory asyncEventingBasicConsumerFactory, IFakeMessageProcessor fakeMessageProcessor) : base(logger, connectionFactory, sinkOptions, sinkDependencies, queueName, rabbitMqConfiguration, asyncEventingBasicConsumerFactory)
+        internal FakeWorkerService(ILogger<FakeWorkerService> logger, IRabbitConnectionFactory connectionFactory, MSSqlServerSinkOptions sinkOptions, ISinkDependencies sinkDependencies, string queueName, RabbitMqClientConsumerConfiguration rabbitMqConfiguration, IAsyncEventingBasicConsumerFactory asyncEventingBasicConsumerFactory, IFakeMessageProcessor fakeMessageProcessor) : base(logger, connectionFactory, sinkOptions, sinkDependencies, queueName, rabbitMqConfiguration, asyncEventingBasicConsumerFactory)
         {
             _fakeMessageProcessor = fakeMessageProcessor;
         }
@@ -44,7 +44,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
         private readonly Mock<ILogger<FakeWorkerService>> _logger = new();
         private readonly Mock<IRabbitConnectionFactory> _connectionFactory = new();
         private readonly MSSqlServerSinkOptions _sinkOptions = new();
-        private readonly Mock<SinkDependencies> _sinkDependencies = new();
+        private readonly Mock<ISinkDependencies> _sinkDependencies = new();
         private RabbitMqClientConsumerConfiguration _rabbitMqConfiguration = new();
         private readonly Mock<IAsyncEventingBasicConsumerFactory> _asyncEventingBasicConsumerFactory = new();
         private FakeWorkerService? _sut;
@@ -98,7 +98,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
             CreateFakeWorkerService();
 
             // Assert
-            _sinkDependencies.Verify(x => x.SqlTableCreator!.Execute(), Times.Once);
+            _sinkDependencies.Verify(x => x.SqlTableCreator.Execute(), Times.Once);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
             CreateFakeWorkerService();
 
             // Assert
-            _sinkDependencies.Verify(x => x.SqlTableCreator!.Execute(), Times.Never);
+            _sinkDependencies.Verify(x => x.SqlTableCreator.Execute(), Times.Never);
         }
 
         [Fact]

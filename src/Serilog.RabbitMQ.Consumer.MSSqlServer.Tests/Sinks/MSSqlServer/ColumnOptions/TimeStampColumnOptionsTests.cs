@@ -11,7 +11,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CanSetDataTypeDateTime()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act - should not throw
             options.TimeStamp.DataType = SqlDbType.DateTime;
@@ -22,7 +22,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CanSetDataTypeDateTimeOffset()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act - should not throw
             options.TimeStamp.DataType = SqlDbType.DateTimeOffset;
@@ -33,7 +33,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CannotSetDataTypeNVarChar()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act and assert - should throw
             Assert.Throws<ArgumentException>(() => options.TimeStamp.DataType = SqlDbType.NVarChar);
@@ -44,7 +44,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.ColumnOp
         public void CanSetDataTypeDateTime2()
         {
             // Arrange
-            var options = new Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
+            var options = new Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions();
 
             // Act - should not throw
             options.TimeStamp.DataType = SqlDbType.DateTime2;

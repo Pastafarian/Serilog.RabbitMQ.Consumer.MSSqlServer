@@ -9,7 +9,7 @@ public class AuditService(
     ILogger<AuditService> logger,
     IRabbitConnectionFactory connectionFactory,
     MSSqlServerSinkOptions sinkOptions,
-    SinkDependencies sinkDependencies,
+    ISinkDependencies sinkDependencies,
     RabbitMqClientConsumerConfiguration configuration,
     IAsyncEventingBasicConsumerFactory asyncEventingBasicConsumerFactory)
     : WorkerService<AuditService>(logger, connectionFactory, sinkOptions, sinkDependencies,
@@ -19,6 +19,7 @@ public class AuditService(
     {
         try
         {
+
             if (SinkDependencies.SqlLogEventWriter != null)
                 await SinkDependencies.SqlLogEventWriter.WriteEvent(message);
 

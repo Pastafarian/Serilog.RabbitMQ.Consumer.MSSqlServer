@@ -30,16 +30,16 @@ public abstract class WorkerService<T> : BackgroundService
     protected readonly ILogger<T> _logger;
     private readonly IRabbitConnectionFactory _connectionFactory;
     private readonly string _queueName;
-    protected SinkDependencies SinkDependencies;
+    internal readonly ISinkDependencies SinkDependencies;
     private readonly RabbitMqClientConsumerConfiguration _rabbitMqConfiguration;
     private readonly IAsyncEventingBasicConsumerFactory _asyncEventingBasicConsumerFactory;
     protected IModel? Channel;
     protected MSSqlServerSinkOptions SinkOptions;
 
-    protected WorkerService(ILogger<T> logger,
+    internal WorkerService(ILogger<T> logger,
         IRabbitConnectionFactory connectionFactory,
         MSSqlServerSinkOptions sinkOptions,
-        SinkDependencies sinkDependencies,
+        ISinkDependencies sinkDependencies,
         string queueName,
         RabbitMqClientConsumerConfiguration rabbitMqConfiguration,
         IAsyncEventingBasicConsumerFactory asyncEventingBasicConsumerFactory)
@@ -55,7 +55,7 @@ public abstract class WorkerService<T> : BackgroundService
         CheckSinkDependencies(sinkDependencies);
     }
 
-    private static void CreateDatabaseAndTable(MSSqlServerSinkOptions sinkOptions, SinkDependencies sinkDependencies)
+    private static void CreateDatabaseAndTable(MSSqlServerSinkOptions sinkOptions, ISinkDependencies sinkDependencies)
     {
         if (sinkOptions.AutoCreateSqlDatabase)
         {
@@ -68,7 +68,7 @@ public abstract class WorkerService<T> : BackgroundService
         }
     }
 
-    private static void CheckSinkDependencies(SinkDependencies sinkDependencies)
+    private static void CheckSinkDependencies(ISinkDependencies sinkDependencies)
     {
         if (sinkDependencies == null)
         {
@@ -133,7 +133,7 @@ public abstract class WorkerService<T> : BackgroundService
                         TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
                     .Execute(async () =>
                     {
-                        Debug.WriteLine($"Processing message {nameof(T)}");
+                        Debug.WriteLine("Processing message {0}", messageString);
 
                         await ProcessMessage(message, ea);
                     });

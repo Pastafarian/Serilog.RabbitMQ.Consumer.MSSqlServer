@@ -17,6 +17,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform.SqlClient
             {
                 Enlist = enlist
             };
+            //_sqlConnectionStringBuilder
         }
 
         public string ConnectionString => _sqlConnectionStringBuilder.ConnectionString;

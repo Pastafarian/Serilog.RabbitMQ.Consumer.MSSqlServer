@@ -17,8 +17,8 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer
 
             var properties = new Dictionary<string, OpenApiSchema>
             {
-                { "status", new OpenApiSchema() { Type = "string" } },
-                { "errors", new OpenApiSchema() { Type = "array" } }
+                { "status", new OpenApiSchema { Type = "string" } },
+                { "errors", new OpenApiSchema { Type = "array" } }
             };
 
             var response = new OpenApiResponse();
