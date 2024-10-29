@@ -8,7 +8,7 @@ using Serilog.RabbitMQ.Consumer.MSSqlServer.Extensions;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal class StandardColumnDataGenerator : IStandardColumnDataGenerator
+    public class StandardColumnDataGenerator : IStandardColumnDataGenerator
     {
         private readonly ColumnOptions.ColumnOptions _columnOptions;
         private readonly IFormatProvider _formatProvider;

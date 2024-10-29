@@ -1,4 +1,6 @@
-﻿namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
+﻿using System.Diagnostics;
+
+namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
 {
     internal abstract class SqlCommandExecutor : ISqlCommandExecutor
     {
@@ -19,6 +21,7 @@
             {
                 using (var conn = _sqlConnectionFactory.Create())
                 {
+                    Debug.WriteLine(" SqlCommandExecutor connection string", conn.ConnectionString);
                     var sql = _sqlWriter.GetSql();
                     using (var cmd = conn.CreateCommand(sql))
                     {

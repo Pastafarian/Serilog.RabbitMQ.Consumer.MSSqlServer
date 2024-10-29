@@ -177,6 +177,10 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.RabbitMQ
                             : _connectionFactory.CreateConnection(_config.Hostnames);
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine("dds" + e.Message);
+                }
                 finally
                 {
                     _connectionLock.Release();

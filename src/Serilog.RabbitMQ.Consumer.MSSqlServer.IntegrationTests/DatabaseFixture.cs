@@ -9,6 +9,11 @@ using Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.Setup;
 using Testcontainers.MsSql;
 using Testcontainers.RabbitMq;
 using Xunit.Sdk;
+using ColumnOptions = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions.ColumnOptions;
+using IAdditionalColumnDataGenerator = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output.IAdditionalColumnDataGenerator;
+using ILogEventDataGenerator = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output.ILogEventDataGenerator;
+using IStandardColumnDataGenerator = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output.IStandardColumnDataGenerator;
+using LogEventDataGenerator = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output.LogEventDataGenerator;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests;
 using static System.FormattableString;
@@ -45,7 +50,7 @@ public class DatabaseFixture : IDisposable
     public DatabaseFixture()
     {
         MsSqlContainer = new MsSqlBuilder().WithName("sql-server-2022").WithPortBinding(5500, 5500).WithPassword("Moo12345!@").Build();
-        RabbitMqContainer = new RabbitMqBuilder().WithPassword("guest").WithUsername("guest").WithName("RabbitMqContainer").WithPortBinding(5672, 5672).WithCleanUp(true).Build();
+        RabbitMqContainer = new RabbitMqBuilder().WithPassword("serilog").WithUsername("serilog").WithName("RabbitMqContainer").WithPortBinding(5672, 5672).WithCleanUp(true).Build();
         MsSqlContainer.StartAsync().GetAwaiter().GetResult();
         RabbitMqContainer.StartAsync().GetAwaiter().GetResult();
         LogEventsConnectionString = MsSqlContainer.GetConnectionString();
@@ -56,11 +61,14 @@ public class DatabaseFixture : IDisposable
 
     public void BuildConsumerHttpClient(Func<IServiceCollection, bool>? registerCustomIocForConsumer = null)
     {
-        factory = new ConsumerWebApplicationFactory(MsSqlContainer.GetConnectionString(), service =>
+        var connectionString = MsSqlContainer.GetConnectionString();
+        factory = new ConsumerWebApplicationFactory(connectionString, service =>
         {
+            registerCustomIocForConsumer?.Invoke(service);
+
             service.RemoveAll(typeof(ConnectionString));
 
-            service.TryAddTransient(_ => new ConnectionString(MsSqlContainer.GetConnectionString(), Database));
+            service.TryAddTransient(_ => new ConnectionString(connectionString, Database));
 
             service.RemoveAll(typeof(MSSqlServerSinkOptions));
 
@@ -73,7 +81,15 @@ public class DatabaseFixture : IDisposable
 
             service.TryAddTransient(_ => sinkOptions);
 
-            registerCustomIocForConsumer?.Invoke(service);
+            service.RemoveAll(typeof(LogEventDataGenerator));
+            var sp = service.BuildServiceProvider();
+
+            var columnOptions = sp.GetRequiredService<ColumnOptions>();
+            var standardColumnDataGenerator = sp.GetRequiredService<IStandardColumnDataGenerator>();
+            var additionalColumnDataGenerator = sp.GetRequiredService<IAdditionalColumnDataGenerator>();
+            service.AddTransient<ILogEventDataGenerator>((_) => new LogEventDataGenerator(columnOptions, standardColumnDataGenerator, additionalColumnDataGenerator));
+
+
 
             return true;
         });
@@ -81,7 +97,7 @@ public class DatabaseFixture : IDisposable
     }
     public void KillApplication()
     {
-        factory.Dispose();
+
     }
 
     public void BuildProducerHttpClient()
@@ -96,7 +112,8 @@ public class DatabaseFixture : IDisposable
         {
             conn.Open();
             var databases = conn.Query("select name from sys.databases");
-            conn.Query("DELETE FROM LogEvents");
+            Console.WriteLine(databases);
+            //conn.Query("DELETE FROM LogEvents");
             //if (databases.Any(d => d.name == Database)) conn.Execute(DropLogEventsDatabase);
         }
     }
@@ -116,6 +133,7 @@ public class DatabaseFixture : IDisposable
 
     public void Dispose()
     {
+        //factory.Dispose();
         DeleteDatabase();
         MsSqlContainer.DisposeAsync().GetAwaiter().GetResult();
         RabbitMqContainer.DisposeAsync().GetAwaiter().GetResult();

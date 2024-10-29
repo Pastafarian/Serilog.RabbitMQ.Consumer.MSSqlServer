@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using System.Text;
 using Serilog.Debugging;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
@@ -31,6 +32,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
             try
             {
                 using var connection = _sqlConnectionFactory.Create();
+                Debug.Print($"SqlLogEventWriter connection string {connection.ConnectionString}");
                 //using var tran = connection.BeginTransaction();
                 await connection.OpenAsync();
                 using (var command = connection.CreateCommand())

@@ -1,51 +1,71 @@
 ﻿extern alias ConsumerAlias;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer;
 using ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.ColumnOptions;
 using Dapper;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog.Loggers.RabbitMQ;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.TestUtils;
+using LoggingService = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers.LoggingService;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 {
-    [Collection("Database collection")]
+    using Program = ConsumerAlias::Serilog.RabbitMQ.Consumer.MSSqlServer.Program;
+
+    public class BasicWebApplication : WebApplicationFactory<Program>
+    {
+        private readonly Action<IServiceCollection> _configureServices;
+
+        public BasicWebApplication(Action<IServiceCollection> configureServices)
+        {
+            _configureServices = configureServices;
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureTestServices((services =>
+            {
+                _configureServices(services);
+
+            }));
+        }
+    }
+
+    //   [Collection("Database collection")]
     [Trait(TestCategory.TraitName, TestCategory.Integration)]
-    public class AdditionalPropertiesTests //: IClassFixture<DatabaseFixture>//: DatabaseTestsBase//, IClassFixture<ProducerAndConsumerFixture>
+    public class AdditionalPropertiesTests : IDisposable
     {
         private readonly DatabaseFixture _fixture;
 
         //private readonly ProducerAndConsumerFixture _fixture;
 
-        public AdditionalPropertiesTests(DatabaseFixture fixture)
+        public AdditionalPropertiesTests()
         {
-            _fixture = fixture;
-
+            _fixture = new DatabaseFixture();
         }
 
         [Fact]
         public async Task WritesLogEventWithCustomNamedProperties()
         {
             // Arrange
-            //await _fixture.MsSqlContainer.StartAsync();
-            //await _fixture.RabbitMqContainer.StartAsync();
-            //await _fixture.MsSqlContainer.DisposeAsync();
-            //await _fixture.RabbitMqContainer.DisposeAsync();
-            //_fixture.BuildTestContainers();
-            //_fixture.BuildConsumerHttpClient();
-            //_fixture.BuildProducerHttpClient();
-            //await _fixture.MsSqlContainer.StartAsync();
-            //await _fixture.RabbitMqContainer.StartAsync();
-
-            // Arrange
             const string additionalColumn1Name = "AdditionalColumn1";
             const string additionalProperty1Name = "AdditionalProperty1";
             const string additionalColumn2Name = "AdditionalColumn2";
             const string additionalProperty2Name = "AdditionalProperty2";
+            const string messageTemplate = $"Hello {{{additionalProperty1Name}}} from thread {{{additionalProperty2Name}}}";
+            const string property1Value = "PropertyValue1";
+            const int property2Value = 2;
+            var expectedMessage = $"Hello \"{property1Value}\" from thread {property2Value}";
+
             var columnOptions = new ColumnOptions
             {
                 AdditionalColumns =
@@ -67,13 +87,12 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
                     }
                 ]
             };
-            const string messageTemplate = $"Hello {{{additionalProperty1Name}}} from thread {{{additionalProperty2Name}}}";
-            const string property1Value = "PropertyValue1";
-            const int property2Value = 2;
-            var expectedMessage = $"Hello \"{property1Value}\" from thread {property2Value}";
 
             _fixture.BuildConsumerHttpClient(service =>
             {
+                service.RemoveAll(typeof(LoggingService));
+                service.AddHostedService<LoggingService>();
+                service.TryAddTransient(_ => columnOptions);
                 service.RemoveAll(typeof(ColumnOptions));
                 service.TryAddTransient(_ => columnOptions);
 
@@ -88,7 +107,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 
             var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
             logger.Information(messageTemplate, property1Value, property2Value);
-            await Task.Delay(19000);
+            await Task.Delay(3000);
 
             // Assert
             VerifyLogMessageWasWritten(expectedMessage, "Message");
@@ -204,6 +223,8 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
             var expectedMessage = $"Hello \"{property1Value}\" from thread null";
             _fixture.BuildConsumerHttpClient(service =>
             {
+                service.RemoveAll(typeof(LoggingService));
+                service.AddHostedService<LoggingService>();
                 service.RemoveAll(typeof(ColumnOptions));
                 service.TryAddTransient(_ => columnOptions);
 
@@ -218,11 +239,13 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 
             var logger = LoggerBuilder.BuildLogger(loggerConfiguration);
             logger.Information(messageTemplate, property1Value, null);
-            await Task.Delay(9000);
+            await Task.Delay(3000);
+
             VerifyDatabaseColumnsWereCreated(columnOptions.AdditionalColumns);
             VerifyLogMessageWasWritten(expectedMessage);
             VerifyStringColumnWritten(additionalColumnName1, property1Value);
-            DatabaseFixture.DeleteDatabase();
+
+            Debug.Print($"Test 1 Done");
         }
 
         protected void VerifyDatabaseColumnsWereCreated(IEnumerable<SqlColumn> columnDefinitions)
@@ -264,8 +287,10 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
 
         protected void VerifyStringColumnWritten(string columnName, string expectedValue)
         {
-            using (var conn = new SqlConnection(_fixture.MsSqlContainer.GetConnectionString()))
+            var connectionString = _fixture.MsSqlContainer.GetConnectionString();
+            using (var conn = new SqlConnection(connectionString))
             {
+                Debug.Print($"VerifyStringColumnWritten connection string {connectionString}");
                 var logEvents = conn.Query<string>($"SELECT {columnName} FROM {DatabaseFixture.LogTableName}");
 
                 logEvents.Should().Contain(c => c == expectedValue);
@@ -354,5 +379,9 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests
         //{
         //    _fixture.Dispose();
         //}
+        public void Dispose()
+        {
+            _fixture.Dispose();
+        }
     }
 }

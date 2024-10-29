@@ -141,7 +141,7 @@ public abstract class WorkerService<T> : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error writing batch to SQL Server. Message String:{MessageString}", messageString);
+                _logger.LogError(ex, "Error writing batch to SQL Server. Message String:{MessageString} - Exception:  " + ex.Message + " " + ex.InnerException?.Message, messageString);
             }
         };
 

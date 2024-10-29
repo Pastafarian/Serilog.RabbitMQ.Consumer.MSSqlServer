@@ -53,7 +53,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
 
             builder.Services.AddTransient(_ => new ConnectionString(conStr, "Logs"));
 
-
+            builder.Services.AddTransient<IFormatProvider>((_) => null!);
             builder.Services.AddTransient<IRabbitConnectionFactory, RabbitConnectionFactory>();
             builder.Services.AddTransient(s => s.GetService<IRabbitConnectionFactory>()!.GetConnectionFactory());
             builder.Services.AddTransient<IAsyncEventingBasicConsumerFactory, AsyncEventingBasicConsumerFactory>();
@@ -61,12 +61,27 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Setup
             builder.Services.AddTransient<IStandardColumnDataGenerator, StandardColumnDataGenerator>();
             builder.Services.AddTransient<IXmlPropertyFormatter, XmlPropertyFormatter>();
             builder.Services.AddTransient<ISinkDependencies, SinkDependencies>();
+            builder.Services.AddTransient<IColumnSimplePropertyValueResolver, ColumnSimplePropertyValueResolver>();
+            builder.Services.AddTransient<IAdditionalColumnDataGenerator, AdditionalColumnDataGenerator>();
+            builder.Services.AddTransient<IColumnHierarchicalPropertyValueResolver, ColumnHierarchicalPropertyValueResolver>();
+            builder.Services.AddTransient(_ => new ColumnOptionsProvider().ColumnOptions);
+            var sp = builder.Services.BuildServiceProvider();
+
+            var columnOptions = sp.GetRequiredService<ColumnOptions>();
+            var standardColumnDataGenerator = sp.GetRequiredService<IStandardColumnDataGenerator>();
+            var additionalColumnDataGenerator = sp.GetRequiredService<IAdditionalColumnDataGenerator>();
+            builder.Services.AddTransient<ILogEventDataGenerator>((_) => new LogEventDataGenerator(columnOptions, standardColumnDataGenerator, additionalColumnDataGenerator));
+
+
+
             //builder.Services.AddTransient<SinkDependencies>();
 
-            builder.Services.AddTransient(_ => new ColumnOptionsProvider().ColumnOptions);
 
-            builder.Services.AddHostedService<LoggingService>();
+
+
             builder.Services.AddHostedService<AuditService>();
+            builder.Services.AddHostedService<LoggingService>();
+
 
             return builder;
         }

@@ -13,8 +13,6 @@ public sealed class EndToEndTests : IClassFixture<DatabaseFixture>
     public EndToEndTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
-        //MsSqlContainer.StartAsync().GetAwaiter().GetResult();
-        //RabbitMqContainer.StartAsync().GetAwaiter().GetResult();
     }
 
     [Fact]
@@ -25,7 +23,7 @@ public sealed class EndToEndTests : IClassFixture<DatabaseFixture>
         var connectionString = _fixture.MsSqlContainer.GetConnectionString();
         var auditMessage1 = $"unique-message-{Guid.NewGuid()}";
         var auditMessage2 = $"unique-message-{Guid.NewGuid()}";
-
+        _fixture.BuildConsumerHttpClient();
 
         // Act
         if (_fixture.ProducerHttpClient != null)
@@ -37,7 +35,7 @@ public sealed class EndToEndTests : IClassFixture<DatabaseFixture>
 
         // Assert
         var connection = new SqlConnection(connectionString);
-        var rows = connection.Query<LogRow>("SELECT * FROM [Logging].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + auditMessage1 + "%", y = "%" + auditMessage2 + "%" });
+        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + auditMessage1 + "%", y = "%" + auditMessage2 + "%" });
 
         rows.Should().HaveCount(2);
     }
@@ -50,18 +48,18 @@ public sealed class EndToEndTests : IClassFixture<DatabaseFixture>
         var connectionString = _fixture.MsSqlContainer.GetConnectionString();
         var logMessage1 = $"unique-message-{Guid.NewGuid()}";
         var logMessage2 = $"unique-message-{Guid.NewGuid()}";
-
+        _fixture.BuildConsumerHttpClient();
         // Act
         if (_fixture.ProducerHttpClient != null)
         {
             await _fixture.ProducerHttpClient.GetAsync("LogException?message=" + logMessage1);
             await _fixture.ProducerHttpClient.GetAsync("LogException?message=" + logMessage2);
         }
-        await Task.Delay(7000);
+        await Task.Delay(5000);
 
         // Assert
         var connection = new SqlConnection(connectionString);
-        var rows = connection.Query<LogRow>("SELECT * FROM [Logging].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + logMessage1 + "%", y = "%" + logMessage2 + "%" });
+        var rows = connection.Query<LogRow>("SELECT * FROM [master].[dbo].[LogEvents] WHERE Exception like @n OR Exception like @y", new { n = "%" + logMessage1 + "%", y = "%" + logMessage2 + "%" });
 
         rows.Should().HaveCount(2);
     }

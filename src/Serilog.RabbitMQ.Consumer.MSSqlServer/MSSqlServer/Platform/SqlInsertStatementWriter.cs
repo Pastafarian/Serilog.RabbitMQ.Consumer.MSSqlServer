@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using System.Text;
 using Serilog.Debugging;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.BackgroundWorkers;
@@ -49,7 +50,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
 
                             var fieldList = new StringBuilder(Invariant($"INSERT INTO [{_schemaName}].[{_tableName}] ("));
                             var parameterList = new StringBuilder(") VALUES (");
-
+                            var paramsString = string.Empty;
                             var index = 0;
                             foreach (var field in _logEventDataGenerator.GetColumnsAndValues(logEvent))
                             {
@@ -62,7 +63,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
                                 fieldList.Append(Invariant($"[{field.Key}]"));
                                 parameterList.Append("@P");
                                 parameterList.Append(index);
-
+                                paramsString += Invariant($"@P{index} = {field.Value}, ");
                                 command.AddParameter(Invariant($"@P{index}"), field.Value);
 
                                 index++;
@@ -70,9 +71,10 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
 
                             parameterList.Append(')');
                             fieldList.Append(parameterList);
-
                             command.CommandText = fieldList.ToString();
 
+                            Debug.Print($"WriteBatch connection string fieldList - {fieldList} parameterList - {parameterList} paramsString - {paramsString}");
+                            Debug.Print($"WriteBatch connection string written to {cn.ConnectionString}");
                             await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         }
                     }

@@ -2,7 +2,7 @@
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal interface ILogEventDataGenerator
+    public interface ILogEventDataGenerator
     {
         IEnumerable<KeyValuePair<string, object>> GetColumnsAndValues(LogEventWithExceptionAsJsonString logEvent);
     }

@@ -16,7 +16,7 @@ using Serilog.Events;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal interface IXmlPropertyFormatter
+    public interface IXmlPropertyFormatter
     {
         string GetValidElementName(string name);
         string Simplify(LogEventPropertyValue value, ColumnOptions.ColumnOptions.PropertiesColumnOptions options);

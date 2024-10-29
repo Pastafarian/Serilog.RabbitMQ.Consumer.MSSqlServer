@@ -1,5 +1,4 @@
 using Testcontainers.MsSql;
-using Testcontainers.RabbitMq;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.IntegrationTests.Setup;
 
@@ -13,13 +12,6 @@ public class TestContainersBase
 
     public static readonly MsSqlContainer MsSqlContainer
         = new MsSqlBuilder().WithName("sql-server-2022").WithPortBinding(5500, 5500).WithPassword("Moo12345!@").Build();
-
-    public static readonly RabbitMqContainer RabbitMqContainer = new RabbitMqBuilder().WithPassword("guest").WithUsername("guest")
-        .WithPortBinding(5672)
-        .WithPortBinding(15672)
-        .WithExposedPort(5672)
-        .WithExposedPort(15672)
-        .Build();
 }
 
 //public sealed class ProducerAndConsumerFixture(IMessageSink messageSink) : IAsyncLifetime

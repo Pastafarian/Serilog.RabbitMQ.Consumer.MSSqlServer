@@ -2,7 +2,7 @@
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal class ColumnHierarchicalPropertyValueResolver : IColumnHierarchicalPropertyValueResolver
+    public class ColumnHierarchicalPropertyValueResolver : IColumnHierarchicalPropertyValueResolver
     {
         public KeyValuePair<string, LogEventPropertyValue> GetPropertyValueForColumn(SqlColumn additionalColumn, IReadOnlyDictionary<string, LogEventPropertyValue> properties)
         {

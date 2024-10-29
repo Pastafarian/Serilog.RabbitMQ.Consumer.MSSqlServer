@@ -20,7 +20,12 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.BackgroundWorkers
         private readonly MSSqlServerSinkOptions _sinkOptions = new();
         private readonly Mock<ISinkDependencies> _sinkDependencies = new();
         private readonly Mock<IAsyncEventingBasicConsumerFactory> _asyncEventingBasicConsumerFactory = new();
-        private readonly RabbitMqClientConsumerConfiguration _rabbitMqConfiguration = new();
+
+        private readonly RabbitMqClientConsumerConfiguration _rabbitMqConfiguration =
+            new RabbitMqClientConsumerConfiguration
+            {
+
+            };
         private readonly Mock<IModel> _mockChannel;
         private readonly LoggingService _sut;
 

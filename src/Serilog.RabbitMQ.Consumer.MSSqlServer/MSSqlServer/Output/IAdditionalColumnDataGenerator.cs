@@ -2,7 +2,7 @@
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal interface IAdditionalColumnDataGenerator
+    public interface IAdditionalColumnDataGenerator
     {
         KeyValuePair<string, object> GetAdditionalColumnNameAndValue(SqlColumn additionalColumn, IReadOnlyDictionary<string, LogEventPropertyValue> properties);
     }

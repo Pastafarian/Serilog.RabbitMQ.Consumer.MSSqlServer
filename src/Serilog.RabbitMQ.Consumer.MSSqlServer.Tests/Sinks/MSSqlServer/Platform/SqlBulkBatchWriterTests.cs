@@ -116,7 +116,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.Tests.Sinks.MSSqlServer.Platform
         }
 
         [Fact]
-        public async Task WriteBatchCallsSqlConnectionWrappeCreateSqlBulkCopyWithDisableTriggersTrue()
+        public async Task WriteBatchCallsSqlConnectionWrapperCreateSqlBulkCopyWithDisableTriggersTrue()
         {
             // Arrange
             var logEvents = CreateLogEvents();

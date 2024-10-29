@@ -23,7 +23,7 @@ public class ConsumerWebApplicationFactory(string connectionString, Func<IServic
         builder.ConfigureTestServices(services =>
             {
                 services.RemoveAll(typeof(ConnectionString));
-                services.AddScoped(_ => new ConnectionString(connectionString, "Logs"));
+                services.AddScoped(_ => new ConnectionString(connectionString, "Logging"));
                 if (RegisterCustomIoc != null)
                 {
                     RegisterCustomIoc(services);

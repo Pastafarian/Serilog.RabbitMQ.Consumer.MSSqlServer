@@ -30,15 +30,13 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Platform
         private readonly object balanceLock = new();
         public async Task WriteBatch(List<LogEventWithExceptionAsJsonString> events, DataTable dataTable)
         {
-
             try
             {
-
                 FillDataTable(events, dataTable);
-
 
                 using var cn = _sqlConnectionFactory.Create();
                 await cn.OpenAsync();
+
 
                 using var copy = cn.CreateSqlBulkCopy(_disableTriggers,
                     string.Format(CultureInfo.InvariantCulture, "[{0}].[{1}]", _schemaName, _tableName));

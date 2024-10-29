@@ -1,10 +1,11 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Serilog.Events;
 using Serilog.RabbitMQ.Consumer.MSSqlServer.Extensions;
 
 namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
 {
-    internal class AdditionalColumnDataGenerator : IAdditionalColumnDataGenerator
+    public class AdditionalColumnDataGenerator : IAdditionalColumnDataGenerator
     {
         private readonly IColumnSimplePropertyValueResolver _columnSimplePropertyValueResolver;
         private readonly IColumnHierarchicalPropertyValueResolver _columnHierarchicalPropertyValueResolver;
@@ -25,6 +26,7 @@ namespace Serilog.RabbitMQ.Consumer.MSSqlServer.MSSqlServer.Output
                 ? _columnSimplePropertyValueResolver.GetPropertyValueForColumn(additionalColumn, properties)
                 : _columnHierarchicalPropertyValueResolver.GetPropertyValueForColumn(additionalColumn, properties);
 
+            Debug.Print($"Key {property.Key} Value {property.Value} - additionalColumn.HasHierarchicalPropertyName {additionalColumn.HasHierarchicalPropertyName}");
             var columnName = additionalColumn.ColumnName;
             if (property.Value == null)
             {
